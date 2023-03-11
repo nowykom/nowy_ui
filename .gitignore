@@ -15,6 +15,7 @@ Debug
 Release
 packages
 global-packages
+artifacts
 packages
 backup
 pub

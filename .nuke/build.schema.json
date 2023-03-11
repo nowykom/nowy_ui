@@ -47,6 +47,10 @@
           "type": "boolean",
           "description": "Disables displaying the NUKE logo"
         },
+        "NuGetAzureDevOpsPassword": {
+          "type": "string",
+          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
+        },
         "Partition": {
           "type": "string",
           "description": "Partition to use on CI"
@@ -72,11 +76,17 @@
           "items": {
             "type": "string",
             "enum": [
+              "CiGithubActionsLinux",
               "Clean",
               "Compile",
+              "CreateNugetPackages",
               "Restore"
             ]
           }
+        },
+        "Solution": {
+          "type": "string",
+          "description": "Path to a solution file that is automatically loaded"
         },
         "Target": {
           "type": "array",
@@ -84,8 +94,10 @@
           "items": {
             "type": "string",
             "enum": [
+              "CiGithubActionsLinux",
               "Clean",
               "Compile",
+              "CreateNugetPackages",
               "Restore"
             ]
           }
