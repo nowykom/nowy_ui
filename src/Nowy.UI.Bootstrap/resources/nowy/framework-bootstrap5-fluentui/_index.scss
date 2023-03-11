@@ -1,0 +1,84 @@
+/* Colors */
+
+// Neutrals
+
+$white: #fff;
+$gray-100: #f3f2f1;
+$gray-200: #e1dfdd;
+$gray-300: #c8c6c4;
+$gray-400: #b3b0ad;
+$gray-500: #979593;
+$gray-600: #797775;
+$gray-700: #484644;
+$gray-800: #323130;
+$gray-900: #252423;
+$black: #000;
+
+// Shared
+
+$blue: #0078d4;
+$indigo: #5c2e91;
+$purple: #881798;
+$pink: #e3008c;
+$red: #d13438;
+$orange: #ffaa44;
+$yellow: #fce100;
+$green: #498205;
+$teal: #00ad56;
+$cyan: #00b7c3;
+
+// Messaging
+
+$primary: $blue;
+$secondary: $gray-200;
+$success: #107c10;
+$info: #dff6dd;
+$warning: #fff4ce;
+$danger: #a80000;
+$light: $gray-100;
+$dark: $gray-800;
+
+/* Elevation */
+
+$enable-shadows: false;
+
+$box-shadow-sm: none;
+$box-shadow: none;
+$box-shadow-lg: none;
+
+$border-radius: 2px;
+$border-radius-lg: 4px;
+$border-radius-sm: 1px;
+$border-width: 1px;
+$border-color: hsla(210, 18%, 87%, 1);
+
+
+/* Layout */
+
+$grid-breakpoints: (xs: 0, sm: 480px, md: 640px, lg: 1024px, xl: 1366px);
+
+$container-max-widths: (sm: 479px, md: 639px, lg: 1023px, xl: 1365px);
+
+/* Typography */
+
+$enable-responsive-font-sizes: true;
+
+$font-size-base: 1rem; // Assumes the browser default, typically `16px`
+
+$font-weight-lighter: 400;
+$font-weight-light: 400;
+$font-weight-normal: 400;
+$font-weight-bold: 600;
+$font-weight-bolder: 700;
+
+$h1-font-size: $font-size-base * 2.625;
+
+
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+
+@import "variables-override";
+
+@import "~bootstrap/scss/bootstrap";
+
+

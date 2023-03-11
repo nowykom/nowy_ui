@@ -1,0 +1,19 @@
+@import "../colors.scss";
+
+// scss-docs-start theme-color-variables
+$primary: $ts;
+$secondary: $gray-800;
+$primary-text: $ts-600;
+$secondary-text: $gray-600;
+$primary-bg-subtle: $ts-100;
+$secondary-bg-subtle: $gray-100;
+$primary-border-subtle: $ts-200;
+$secondary-border-subtle: $gray-200;
+// scss-docs-end theme-color-variables
+
+
+:root {
+  --bs-primary: $ts;
+  --bs-secondary: $gray-800;
+}
+

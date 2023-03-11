@@ -1,0 +1,32 @@
+.chat-component {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  flex-grow: 1;
+  flex-shrink: 1;
+
+  & .chat-header {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    flex-grow: 0;
+    flex-shrink: 0;
+  }
+
+  & .chat-footer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    flex-grow: 0;
+    flex-shrink: 0;
+  }
+
+  & .chat-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    flex-grow: 0;
+    flex-shrink: 0;
+  }
+}
+

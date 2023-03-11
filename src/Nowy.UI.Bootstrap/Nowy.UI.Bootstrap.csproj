@@ -1,0 +1,70 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <NodeModulesStampFile>node_modules\_NodeModules.stamp</NodeModulesStampFile>
+    <NodeCompileStampFile>wwwroot\output\_NodeCompile.stamp</NodeCompileStampFile>
+
+    <PrepareForBuildDependsOn>
+      NodeCompile;
+      $(PrepareForBuildDependsOn)
+    </PrepareForBuildDependsOn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Havit.Blazor.Components.Web.Bootstrap" Version="3.2.7" />
+    <PackageReference Include="MudBlazor" Version="6.1.9" />
+    <PackageReference Include="Telerik.UI.for.Blazor" Version="4.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="System.Collections.ObjectModel" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="resources\thirdparty" />
+    <Folder Include="wwwroot" />
+  </ItemGroup>
+
+  <Target Name="NodeInstall" Inputs="package.json" Outputs="$(NodeModulesStampFile)">
+    <!--
+        Use npm install or npm ci depending on RestorePackagesWithLockFile value.
+        Uncomment the following lines if you want to use this feature:
+
+        <PropertyGroup>
+          <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        </PropertyGroup>
+     -->
+    <Exec Command="npm ci" Condition="'$(RestorePackagesWithLockFile)' == 'true'" />
+    <Exec Command="npm install" Condition="'$(RestorePackagesWithLockFile)' != 'true'" />
+
+    <!-- Write the stamp file, so incremental builds work -->
+    <Touch Files="$(NodeModulesStampFile)" AlwaysCreate="true" />
+  </Target>
+
+  <Target Name="NodeCompileFindFiles" DependsOnTargets="NodeInstall">
+    <ItemGroup>
+      <_NodeCompileInputs Include="resources\**\*.ts" />
+      <_NodeCompileInputs Include="resources\**\*.js" />
+      <_NodeCompileInputs Include="resources\**\*.scss" />
+    </ItemGroup>
+    <Message Text="_NodeCompileInputs: @(_NodeCompileInputs)" />
+  </Target>
+  <Target Name="NodeCompile" DependsOnTargets="NodeCompileFindFiles" Inputs="@(_NodeCompileInputs)" Outputs="$(NodeCompileStampFile)">
+    <Exec Command="npx webpack" />
+
+    <MakeDir Directories="$(IntermediateOutputPath)" />
+    <Touch Files="$(NodeCompileStampFile)" AlwaysCreate="True" />
+    <ItemGroup>
+      <FileWrites Include="$(NodeCompileStampFile)" />
+    </ItemGroup>
+  </Target>
+
+</Project>

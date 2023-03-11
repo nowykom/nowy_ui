@@ -1,0 +1,62 @@
+.breakpoint-not-md {
+  & nav.navbar {
+    & .navbar-collapse {
+      position: absolute;
+      top: 58px;
+      background: white;
+      z-index: 1;
+      width: min(100vw, 300px);
+      left: 0px;
+      padding: 1rem;
+      border-right: 2px solid rgb(224, 224, 224) !important;
+      height: calc(100vh - 58px);
+    }
+  }
+}
+
+.navbar-space {
+  height: 58px;
+  min-height: 58px;
+  max-height: 58px;
+}
+
+nav.navbar {
+  --bs-navbar-brand-padding-y: 0;
+  position: fixed;
+  width: 100vw;
+  z-index: 1;
+  height: 58px;
+  background: white;
+
+  & .navbar-collapse {
+  }
+
+  & .navbar-brand {
+    flex-direction: row;
+    display: flex;
+    align-items: center;
+  }
+
+  & .dropdown-menu {
+    --bs-dropdown-spacer: 8px;
+    --bs-dropdown-padding-y: 0;
+    --bs-dropdown-divider-margin-y: 0;
+    --bs-dropdown-border-color: rgb(224, 224, 224);
+    --bs-dropdown-border-width: 2px;
+    --bs-dropdown-divider-bg: rgb(224, 224, 224);
+    --bs-dropdown-link-active-bg: #ededed;
+    --bs-dropdown-link-active-color: #000000;
+  }
+
+  & .dropdown-divider {
+    border-top: 2px solid var(--bs-dropdown-divider-bg);
+  }
+
+  & .dropdown-item {
+    height: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+

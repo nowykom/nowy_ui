@@ -1,0 +1,34 @@
+
+// scss-docs-start colors-map
+$colors: (
+        "lr": $lr,
+        "blue": $blue,
+        "indigo": $indigo,
+        "purple": $purple,
+        "pink": $pink,
+        "red": $red,
+        "orange": $orange,
+        "yellow": $yellow,
+        "green": $green,
+        "teal": $teal,
+        "cyan": $cyan,
+        "black": $black,
+        "white": $white,
+        "gray": $gray-600,
+        "gray-dark": $gray-800
+);
+// scss-docs-end colors-map
+
+// scss-docs-start theme-colors-map
+$theme-colors: (
+        "lr": $lr,
+        "primary": $primary,
+        "secondary": $secondary,
+        "success": $success,
+        "info": $info,
+        "warning": $warning,
+        "danger": $danger,
+        "light": $light,
+        "dark": $dark
+);
+// scss-docs-end theme-colors-map

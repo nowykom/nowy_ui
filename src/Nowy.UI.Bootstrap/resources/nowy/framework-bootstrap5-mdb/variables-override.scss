@@ -1,0 +1,4 @@
+$my-theme: mdb-light-theme($primary, $secondary); // create the new theme using primary and secondary colors
+
+// include theme styles
+@include mdb-theme($my-theme);
