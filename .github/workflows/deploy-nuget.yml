@@ -8,9 +8,8 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - 'src/Nowy.Standard/**'
-      - 'src/nuget*'
-#      - '.github/**'
+      - 'src/Nowy.UI/**'
+      - '.github/**'
   workflow_dispatch:
 
 permissions:
