@@ -1,0 +1,56 @@
+<HxSidebar ResponsiveBreakpoint="SidebarResponsiveBreakpoint.None">
+    <TogglerTemplate>
+    </TogglerTemplate>
+    <ItemsTemplate>
+
+        @if (Menu is {} menu1)
+        {
+            foreach (NxNavigationItem item1 in menu1.Items ?? Array.Empty<NxNavigationItem>())
+            {
+                @if (item1 is not NxNavigationMenu menu2)
+                {
+                    <NxSidebarItem Text="@(item1.Title)"
+                                    Href="@(item1.LinkUrl)"
+                                    Match="NavLinkMatch.All"/>
+                }
+                else
+                {
+                    <NxSidebarItem Text="@(item1.Title)"
+                                    Href="@(item1.LinkUrl)"
+                                    Match="NavLinkMatch.All">
+                        @foreach (NxNavigationItem item2 in menu2.Items ?? Array.Empty<NxNavigationItem>())
+                        {
+                            @if (item2 is not NxNavigationMenu menu3)
+                            {
+                                <NxSidebarItem Text="@(item2.Title)"
+                                                Href="@(item2.LinkUrl)"
+                                                Match="NavLinkMatch.All"/>
+                            }
+                            else
+                            {
+                                <NxSidebarItem Text="@(item2.Title)"
+                                                Href="@(item2.LinkUrl)"
+                                                Match="NavLinkMatch.All">
+                                    @foreach (NxNavigationItem item3 in menu3.Items ?? Array.Empty<NxNavigationItem>())
+                                    {
+                                        <NxSidebarItem Text="@(item3.Title)"
+                                                        Href="@(item3.LinkUrl)"
+                                                        Match="NavLinkMatch.All"/>
+                                    }
+                                </NxSidebarItem>
+                            }
+                        }
+                    </NxSidebarItem>
+                }
+            }
+        }
+    </ItemsTemplate>
+</HxSidebar>
+
+
+@code {
+
+    [Parameter]
+    public NxNavigationMenu? Menu { get; set; }
+
+}

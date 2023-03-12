@@ -1,0 +1,76 @@
+@using MudBlazor
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Align="MudBlazor.Align.Center" Typo="Typo.h6">
+            @(DialogTitle)
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudContainer Style="max-height: 60vh; overflow-y: scroll">
+
+            @if (Options is { })
+            {
+                foreach ((string k, string? v) in Options.GetOptions())
+                {
+                    <MudCheckBox
+                        @bind-Checked:get="@(_value == k)"
+                        @bind-Checked:set="@((bool value) => {if (value){ _value = k; }else if (_value == k) {_value = null;}})"
+                        Label="@(v)"
+                        Color="MudBlazor.Color.Primary">
+                    </MudCheckBox>
+                }
+            }
+
+            Options count = @(Options?.GetOptions().Count.ToString() ?? "null")
+            <br/>
+            Value = @(_value?.ToJson())
+
+        </MudContainer>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="MudBlazor.Color.Primary" OnClick="DeleteServer">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter]
+    public string? DialogTitle { get; set; }
+
+    [Parameter]
+    public GridOptions? Options { get; set; }
+
+    private string? _value;
+
+    [Parameter]
+    public string? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        _value = Value;
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void DeleteServer()
+    {
+        Snackbar.Add("Server Deleted", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(_value));
+    }
+
+}

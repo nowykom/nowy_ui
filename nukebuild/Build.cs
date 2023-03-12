@@ -109,7 +109,7 @@ class Build : NukeBuild
         .Before(Restore)
         .Executes(() =>
         {
-            SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
+            SourceDirectory.GlobDirectories("**/bin", "**/obj", "**/node_modules").ForEach(DeleteDirectory);
             EnsureCleanDirectory(ArtifactsDirectory);
         });
 
@@ -143,8 +143,9 @@ class Build : NukeBuild
             string[] projects = new[]
             {
                 "Nowy.UI.Bootstrap",
-                "Nowy.UI.Layout",
+                "Nowy.UI.Common",
                 "Nowy.UI.Grid",
+                "Nowy.UI.Layout",
             };
 
             foreach (string project in projects)

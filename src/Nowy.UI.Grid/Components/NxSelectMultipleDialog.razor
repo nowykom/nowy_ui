@@ -1,0 +1,93 @@
+@using MudBlazor
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Align="MudBlazor.Align.Center" Typo="Typo.h6">
+            @(DialogTitle)
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudContainer Style="max-height: 60vh; overflow-y: scroll">
+
+            @if (_value is { })
+            {
+                foreach (string k in _value)
+                {
+                    if (Options is { } && Options.HasValue(k))
+                        continue;
+
+                    <MudCheckBox
+                        @bind-Checked:get="@(_value?.Contains(k) ?? false)"
+                        @bind-Checked:set="@((bool value) => {if (value){ _value ??= new();_value.Add(k); }else if (_value?.Contains(k) ?? false) {_value ??= new();_value.RemoveAll(o => o == k);}})"
+                        Label="@(k)"
+                        Color="MudBlazor.Color.Primary">
+                    </MudCheckBox>
+                }
+            }
+
+            @if (Options is { })
+            {
+                foreach ((string k, string? v) in Options.GetOptions())
+                {
+                    <MudCheckBox
+                        @bind-Checked:get="@(_value?.Contains(k) ?? false)"
+                        @bind-Checked:set="@((bool value) => {if (value){ _value ??= new();_value.Add(k); }else if (_value?.Contains(k) ?? false) {_value ??= new();_value.RemoveAll(o => o == k);}})"
+                        Label="@(v)"
+                        Color="MudBlazor.Color.Primary">
+                    </MudCheckBox>
+                }
+            }
+
+        </MudContainer>
+
+        Options count = @(Options?.GetOptions().Count.ToString() ?? "null")
+        <br/>
+        Value = @(_value?.ToJson())
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="MudBlazor.Color.Primary" OnClick="DeleteServer">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter]
+    public string? DialogTitle { get; set; }
+
+    [Parameter]
+    public GridOptions? Options { get; set; }
+
+    private List<string>? _value;
+
+    [Parameter]
+    public List<string>? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<List<string>> ValueChanged { get; set; }
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        _value = Value;
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void DeleteServer()
+    {
+        Snackbar.Add("Server Deleted", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(_value));
+    }
+
+}

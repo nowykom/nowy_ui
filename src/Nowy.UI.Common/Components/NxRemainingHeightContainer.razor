@@ -1,0 +1,79 @@
+@implements IDisposable
+@inject IJSRuntime _js
+@inject BrowserService _browser
+
+<div @ref="_element_ref"
+     style="display: flex; flex-direction: column; position: relative; width: 100%; height: 100px; @(Style ?? string.Empty)"
+     class="@(Class ?? string.Empty)">
+
+    @if (_height_is_set)
+    {
+        @(ChildContent)
+    }
+
+</div>
+
+@code {
+
+    private ElementReference _element_ref;
+    private bool _height_is_set;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string? Style { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        _browser.WindowResized += _handleWindowResized;
+        _browser.IntersectionChanged += _handleIntersectionChanged;
+    }
+
+    public void Dispose()
+    {
+        _browser.WindowResized -= _handleWindowResized;
+        _browser.IntersectionChanged -= _handleIntersectionChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await _browser.InitAsync();
+            _updateRemainingHeight();
+            await _browser.InitWindowResizedEventAsync();
+            await _browser.AddIntersectionObserver(_element_ref);
+        }
+    }
+
+    private void _updateRemainingHeight()
+    {
+        ((IJSInProcessRuntime)_js).InvokeVoid("remaining_height_set", _element_ref);
+        _height_is_set = true;
+        StateHasChanged();
+    }
+
+    private void _handleWindowResized(object? sender, BrowserWindowResizedEventArgs e)
+    {
+        _updateRemainingHeight();
+    }
+
+    private void _handleIntersectionChanged(object? sender, BrowserIntersectionChangedEventArgs e)
+    {
+        if (e.Element.Id == _element_ref.Id)
+        {
+            _updateRemainingHeight();
+        }
+    }
+
+
+}

@@ -1,0 +1,19 @@
+<div class="mb-3 @(_class)"
+     style="display: flex; flex-direction: row; flex-wrap: wrap; place-content: space-between; @(_style)">
+    @ChildContent
+</div>
+
+@code {
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object?> AdditionalAttributes { get; set; } = new Dictionary<string, object?>();
+
+    private string _class => AdditionalAttributes?.Get("class", null)?.ToString() ?? string.Empty;
+    private string _style => AdditionalAttributes?.Get("style", null)?.ToString() ?? string.Empty;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+
+
+}

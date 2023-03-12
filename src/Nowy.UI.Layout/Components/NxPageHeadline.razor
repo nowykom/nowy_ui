@@ -1,0 +1,25 @@
+<h1 class="mb-3 @(_class)" style="@(_style)">@(ChildContent)</h1>
+
+@if (IsPageTitle ?? true)
+{
+    <Microsoft.AspNetCore.Components.Web.PageTitle>@(ChildContent) @(!string.IsNullOrEmpty(TenantTitle) ? $" - {TenantTitle}" : string.Empty)</Microsoft.AspNetCore.Components.Web.PageTitle>
+}
+
+@code {
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object?> AdditionalAttributes { get; set; } = new Dictionary<string, object?>();
+
+    private string _class => AdditionalAttributes?.Get("class", null)?.ToString() ?? string.Empty;
+    private string _style => AdditionalAttributes?.Get("style", null)?.ToString() ?? string.Empty;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public bool? IsPageTitle { get; set; }
+
+    [Parameter]
+    public string? TenantTitle { get; set; }
+
+}

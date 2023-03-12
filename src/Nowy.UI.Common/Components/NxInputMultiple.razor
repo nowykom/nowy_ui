@@ -1,0 +1,55 @@
+@using MudBlazor
+@inject IDialogService _dialog_service
+
+<div class="@(Class)" style="@(Style)" onclick="@(() => _openDialogAsync().Forget())">
+    @ChildContent
+</div>
+
+@code {
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public string? Style { get; set; }
+
+    [Parameter]
+    public string? DialogTitle { get; set; }
+
+    private List<string>? _value;
+
+    [Parameter]
+    public List<string>? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<List<string>> ValueChanged { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        _value = Value;
+    }
+
+    private async Task _openDialogAsync()
+    {
+        DialogParameters parameters = new()
+        {
+            [nameof(DialogTitle)] = DialogTitle,
+            [nameof(Value)] = _value,
+        };
+
+        IDialogReference dialog = await _dialog_service.ShowAsync<NxInputMultipleDialog>("Delete Server", parameters);
+        DialogResult result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            _value = (List<string>)result.Data;
+            await ValueChanged.InvokeAsync(_value);
+        }
+    }
+
+}

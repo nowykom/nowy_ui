@@ -1,0 +1,62 @@
+@implements IDisposable
+@inject IJSRuntime _js
+
+<div class="error-component">
+    <div class="error-component-space"></div>
+    @if (IsLoading)
+    {
+        <div class="spinner-border error-component-icon" role="status" style="width: 5rem; height: 5rem;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    }
+    else
+    {
+        <i class="mdi @(Icon ?? "mdi-cancel") error-component-icon color-huze" style="@(FormattableString.Invariant($"font-size: {100 * Scale:0}px; height: {100 * Scale:0}px;"))"></i>
+    }
+    <div class="error-component-text" style="@(FormattableString.Invariant($"font-size: {2.0 * Scale:0.00}rem; margin: 0px {1.0 * Scale:0.00}rem;"))">
+        @if (ChildContent is { })
+        {
+            @ChildContent
+        }
+        @if (Text is { })
+        {
+            @Text
+        }
+    </div>
+    <div class="error-component-space"></div>
+</div>
+
+
+@code {
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public string? Text { get; set; }
+
+    [Parameter]
+    public double Scale { get; set; } = 1;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public bool IsLoading { get; set; }
+
+
+    protected override void OnInitialized()
+    {
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+    }
+
+    public void Dispose()
+    {
+    }
+
+
+}

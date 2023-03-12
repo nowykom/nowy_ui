@@ -1,0 +1,38 @@
+@implements IDisposable
+
+@code {
+
+    [CascadingParameter(Name = nameof(NxBaseMainLayout))]
+    public NxBaseMainLayout? BaseMainLayout { get; set; }
+
+    [Parameter]
+    public RenderFragment? SideMenuContent { get; set; }
+
+    [Parameter]
+    public bool HasPadding { get; set; } = true;
+
+    [Parameter]
+    public bool HasCenteredContainer { get; set; } = true;
+
+    protected override void OnInitialized()
+    {
+        BaseMainLayout?.SetPageSettings(this);
+        base.OnInitialized();
+    }
+
+    protected override bool ShouldRender()
+    {
+        var should_render = base.ShouldRender();
+        if (should_render)
+        {
+            BaseMainLayout?.SendStateHasChanged();
+        }
+        return should_render;
+    }
+
+    public void Dispose()
+    {
+        BaseMainLayout?.SetPageSettings(null);
+    }
+
+}

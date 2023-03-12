@@ -1,0 +1,76 @@
+@implements IDisposable
+@inject IJSRuntime _js
+@inject BrowserService _browser
+@inject ResponsiveStateService _responsive_state_service
+
+<main
+    class="@(Class ?? string.Empty) @(GetResponsiveStateClasses())"
+    style="@(Style ?? string.Empty)">
+
+    @(ChildContent)
+
+</main>
+
+@code {
+
+    private ResponsiveState? ResponsiveState;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string? Style { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    public string GetResponsiveStateClasses()
+    {
+        if (ResponsiveState is null)
+            return string.Empty;
+
+        List<string> ret = new();
+
+        ret.Add(ResponsiveState.IsPortrait ? "is-portrait" : "is-not-portrait");
+        ret.Add(ResponsiveState.IsLandscape ? "is-landscape" : "is-not-landscape");
+        ret.Add(ResponsiveState.BreakpointExtraLarge ? "breakpoint-xl" : "breakpoint-not-xl");
+        ret.Add(ResponsiveState.BreakpointLarge ? "breakpoint-lg" : "breakpoint-not-lg");
+        ret.Add(ResponsiveState.BreakpointMedium ? "breakpoint-md" : "breakpoint-not-md");
+        ret.Add(ResponsiveState.BreakpointSmall ? "breakpoint-sm" : "breakpoint-not-sm");
+
+        return ret.Join(" ");
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        _responsive_state_service.ResponsiveStateChanged += _handleResponsiveStateChanged;
+    }
+
+    public void Dispose()
+    {
+        _responsive_state_service.ResponsiveStateChanged -= _handleResponsiveStateChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+        }
+    }
+
+    private void _handleResponsiveStateChanged(object? sender, ResponsiveStateChangedEventArgs e)
+    {
+        if (ResponsiveState != e.ResponsiveState)
+        {
+            ResponsiveState = e.ResponsiveState;
+            StateHasChanged();
+        }
+    }
+
+
+}

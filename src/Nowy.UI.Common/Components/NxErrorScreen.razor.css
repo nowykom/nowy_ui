@@ -1,0 +1,26 @@
+
+.error-component {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  height: 100%;
+}
+
+  .error-component .error-component-icon {
+    display: flex;
+    align-self: center;
+    place-items: self-end;
+    align-items: center;
+  }
+
+  .error-component .error-component-text {
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    align-items: center;
+  }
+
+  .error-component .error-component-space {
+    display: flex;
+    flex-grow: 1;
+  }

@@ -1,0 +1,82 @@
+@using MudBlazor
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Align="MudBlazor.Align.Center" Typo="Typo.h6">
+            @(DialogTitle)
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudContainer Style="max-height: 60vh; overflow-y: scroll">
+
+            @if (_value is { })
+            {
+                foreach ((int index, string? k) in _value.Select((o, i) => (i,o)))
+                {
+                    <MudTextField
+                        @bind-Value:get="@(_value[index])"
+                        @bind-Value:set="@((string? value) => { _value[index] = value; })"
+                        Label=""
+                        Variant="Variant.Outlined"
+                        Margin="Margin.Dense">
+                    </MudTextField>
+                }
+            }
+        </MudContainer>
+
+        @if (_value is { })
+        {
+            <MudButton
+                OnClick="() => { _value.Add(string.Empty); }"
+                StartIcon="@Icons.Material.Filled.Add"
+                Variant="Variant.Filled"
+                Size="Size.Small"
+                Color="MudBlazor.Color.Primary">
+                Add Value
+            </MudButton>
+        }
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="MudBlazor.Color.Primary" OnClick="DeleteServer">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter]
+    public string? DialogTitle { get; set; }
+
+    private List<string>? _value;
+
+    [Parameter]
+    public List<string>? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<List<string>> ValueChanged { get; set; }
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        _value = Value;
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void DeleteServer()
+    {
+        Snackbar.Add("Server Deleted", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(_value));
+    }
+
+}
