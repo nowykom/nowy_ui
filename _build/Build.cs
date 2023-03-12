@@ -38,11 +38,6 @@ class Build : NukeBuild
     AbsolutePath SourceDirectory => RootDirectory / "src";
     AbsolutePath ArtifactsDirectory => RootDirectory / "build" / "artifacts";
 
-    string TagVersion => GitRepository.Tags.SingleOrDefault(x => x.StartsWith("v"))?[1..];
-    bool IsTaggedBuild => !string.IsNullOrWhiteSpace(TagVersion);
-
-    string VersionSuffix;
-
     static bool IsRunningOnWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
     string NuGetAzureDevOpsSource => "https://pkgs.dev.azure.com/schulz-dev/nowy/_packaging/Nowy/nuget/v3/index.json";
@@ -51,6 +46,7 @@ class Build : NukeBuild
 
     protected override void OnBuildInitialized()
     {
+        /*
         if (false)
         {
             VersionSuffix = !IsTaggedBuild ? $"preview-{DateTime.UtcNow:yyyyMMdd-HHmm}" : "";
@@ -67,6 +63,10 @@ class Build : NukeBuild
         Log.Information("Configuration:\t{Configuration}", Configuration);
         Log.Information("Version suffix:\t{VersionSuffix}", VersionSuffix);
         Log.Information("Tagged build:\t{IsTaggedBuild}", IsTaggedBuild);
+        */
+
+        Log.Information("BUILD SETUP");
+        Log.Information("Configuration:\t{Configuration}", Configuration);
     }
 
     Target Clean => _ => _
@@ -113,10 +113,10 @@ class Build : NukeBuild
             {
                 DotNetTasks.DotNetPack(s => s
                     .SetProject(Solution.GetProject(project))
-                    .SetAssemblyVersion(TagVersion)
-                    .SetFileVersion(TagVersion)
-                    .SetInformationalVersion(TagVersion)
-                    .SetVersionSuffix(VersionSuffix)
+                    // .SetAssemblyVersion(TagVersion)
+                    // .SetFileVersion(TagVersion)
+                    // .SetInformationalVersion(TagVersion)
+                    // .SetVersionSuffix(VersionSuffix)
                     .SetConfiguration(Configuration)
                     .SetOutputDirectory(ArtifactsDirectory)
                     .SetDeterministic(IsServerBuild)
