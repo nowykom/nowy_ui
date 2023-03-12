@@ -82,6 +82,7 @@
             "enum": [
               "CiGithubActionsLinux",
               "Clean",
+              "ClearCache",
               "Compile",
               "CreateNugetPackages",
               "Pack",
@@ -102,6 +103,7 @@
             "enum": [
               "CiGithubActionsLinux",
               "Clean",
+              "ClearCache",
               "Compile",
               "CreateNugetPackages",
               "Pack",
