@@ -51,9 +51,12 @@ class Build : NukeBuild
 
     protected override void OnBuildInitialized()
     {
-        VersionSuffix = !IsTaggedBuild
-            ? $"preview-{DateTime.UtcNow:yyyyMMdd-HHmm}"
-            : "";
+        if (false)
+        {
+            VersionSuffix = !IsTaggedBuild ? $"preview-{DateTime.UtcNow:yyyyMMdd-HHmm}" : "";
+        }
+
+        VersionSuffix = "";
 
         if (IsLocalBuild)
         {
