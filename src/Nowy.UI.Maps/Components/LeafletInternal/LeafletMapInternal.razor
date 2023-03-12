@@ -1,0 +1,85 @@
+﻿@implements IDisposable
+@inject BrowserService _browser
+
+<div @ref="_element_ref"
+     class="leaflet_map"
+     id="@Map?.ElementId">
+</div>
+
+@code {
+
+    private ElementReference _element_ref;
+
+    /// <summary>
+    /// The JavaScript runtime instance used to create the <see cref="Map"/>.
+    /// </summary>
+    [Inject]
+    public IJSRuntime? JSRuntime { get; set; }
+
+    /// <summary>
+    /// The Leaflet <see cref="Map"/> to be rendered by the component.
+    /// </summary>
+    [Parameter]
+    public Map? Map { get; set; }
+
+    /// <summary>
+    /// The <see cref="TileLayer"/> to be added when the <see cref="Map"/> is rendered.
+    /// </summary>
+    [Parameter]
+    public TileLayer? TileLayer { get; set; }
+
+
+    /// <inheritdoc/>
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+        }
+
+        if (Map is not null && Map.IsInitialized == null && TileLayer is not null && JSRuntime is not null)
+        {
+            Map.IsInitialized = false;
+    // Console.WriteLine("   Map.IsInitialized = false;");
+
+            await _browser.AddIntersectionObserver(_element_ref);
+
+            await Map.BindJsObjectReference(new LeafletMapJSBinder(JSRuntime));
+            await TileLayer.AddTo(this.Map);
+            await Map.SubscribeToEvents();
+
+            Map.IsInitialized = true;
+    // Console.WriteLine("   Map.IsInitialized = true;");
+            Map.AfterInitializeAsync().Forget();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        _browser.IntersectionChanged += _handleIntersectionChanged;
+    }
+
+    public void Dispose()
+    {
+        _browser.IntersectionChanged -= _handleIntersectionChanged;
+
+        if (Map is not null && Map.IsInitialized == true)
+        {
+            Map.IsInitialized = null;
+    // Console.WriteLine("   Map.IsInitialized = null;");
+        }
+    }
+
+    private void _handleIntersectionChanged(object? sender, BrowserIntersectionChangedEventArgs e)
+    {
+        if (e.Element.Id == _element_ref.Id)
+        {
+            if (e.IsIntersecting)
+            {
+                _browser.SendWindowResizeAsync().Forget();
+            }
+        }
+    }
+
+}

@@ -1,0 +1,152 @@
+@implements IAsyncDisposable
+@inject IJSRuntime _js
+@inject BrowserService _browser
+@using System.Data
+@using Nowy.UI.Common.Services
+@using Nowy.UI.Maps.Components.LeafletInternal
+
+<LeafletMapInternal Map="_map" TileLayer="_tile_layer"/>
+
+@(ChildContent)
+
+
+@code {
+
+    private readonly string _map_id = StringExtensions.MakeRandomUuid();
+
+    private NxLeafletState _state = new();
+    private NxLeafletInitialState _previous_initialstate = new();
+    private readonly Dictionary<NxLeafletMarker, Marker> _previous_markers = new();
+    private bool _is_updating;
+
+    private readonly Map _map;
+    private readonly TileLayer _tile_layer;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public NxLeafletState? LeafletState { get; set; }
+
+    public NxLeaflet()
+    {
+        _map = new Map(_map_id, new MapOptions
+        {
+            Center = new(lat: 0, lng: 0),
+            Zoom = 4,
+        })
+        {
+            SubscribeEvents = true,
+        };
+
+        string tile_layer_url = "https://maps.digitalkraft.de/osm_tiles/{z}/{x}/{y}.png";
+        TileLayerOptions tile_layer_options = new()
+        {
+            Attribution = @"Map data &copy; <a href=""https://www.openstreetmap.org/"">OpenStreetMap</a> contributors, " +
+                          @"<a href=""https://creativecommons.org/licenses/by-sa/2.0/"">CC-BY-SA</a>"
+        };
+        _tile_layer = new TileLayer(tile_layer_url, tile_layer_options);
+
+        _map.OnClick += (s, e) => _handleMapClickAsync(e).Forget();
+        _map.OnZoomEnd += (s, e) => _handleZoomAsync(e).Forget();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        _state = LeafletState ?? new();
+
+        TryUpdateAsync().Forget();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await _map.DisposeAsync();
+        await _tile_layer.DisposeAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+        }
+    }
+
+    public async Task TryUpdateAsync()
+    {
+        Console.WriteLine($"TryUpdateAsync: {_state.InitialState}, [{_state.Markers.Join(", ")}]");
+
+        if (_is_updating) return;
+        _is_updating = true;
+        StateHasChanged();
+        await Task.Yield();
+
+        try
+        {
+            NxLeafletInitialState initialstate = _state.InitialState;
+
+            if (_previous_initialstate != initialstate)
+            {
+                _previous_initialstate = initialstate;
+                await _map.SetView(new LatLng(lat: initialstate.Center?.Lat ?? 0, lng: initialstate.Center?.Lng ?? 0), zoom: initialstate.Zoom);
+                _state.Zoom = initialstate.Zoom;
+            }
+
+            foreach (NxLeafletMarker marker in _state.Markers)
+            {
+                if (!_previous_markers.TryGetValue(marker, out Marker? m))
+                {
+                    m = new(new LatLng(lat: marker.Location.Lat, lng: marker.Location.Lng), new MarkerOptions
+                    {
+                        Title = marker.Title,
+                    });
+                    await m.AddTo(_map);
+                    _previous_markers[marker] = m;
+                }
+            }
+
+            foreach ((NxLeafletMarker marker, Marker m) in _previous_markers.ToArray())
+            {
+                if (!_state.Markers.Contains(marker))
+                {
+                    await m.Remove();
+                    _previous_markers.Remove(marker);
+                }
+            }
+        }
+        finally
+        {
+            _is_updating = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task _handleMapClickAsync(LeafletMouseEventArgs e)
+    {
+        NxLeafletClickEventArgs e2 = new(new(Lat: e.LatLng.Lat, Lng: e.LatLng.Lng));
+
+        try
+        {
+            _state.SendClick(e2);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in mouse event ({e2}): {ex}");
+        }
+    }
+
+    private async Task _handleZoomAsync(LeafletZoomEventArgs e)
+    {
+        _state.Zoom = e.Zoom;
+    }
+
+
+
+
+}
