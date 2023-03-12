@@ -147,6 +147,8 @@ class Build : NukeBuild
                 "Nowy.UI.Grid",
                 "Nowy.UI.Layout",
                 "Nowy.UI.Maps",
+                "Nowy.UI.ClientWasm",
+                "Nowy.UI.Server",
             };
 
             foreach (string project in projects)

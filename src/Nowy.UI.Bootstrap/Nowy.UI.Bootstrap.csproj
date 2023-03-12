@@ -32,6 +32,10 @@
     <Folder Include="resources\thirdparty" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Nowy.UI.Common\Nowy.UI.Common.csproj" />
+  </ItemGroup>
+
   <Target Name="NodeInstall" Inputs="package.json" Outputs="$(NodeModulesStampFile)">
     <!--
         Use npm install or npm ci depending on RestorePackagesWithLockFile value.
