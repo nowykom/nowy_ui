@@ -9,7 +9,7 @@ on:
     branches: [ "main" ]
     paths:
       - 'src/Nowy.UI*/**'
-      - '_build/**'
+      - 'nukebuild/**'
       - '.github/**'
   workflow_dispatch:
 
@@ -40,7 +40,7 @@ jobs:
         run: bash -c 'yes | androidsdk "platform-tools" "platforms;android-33" "ndk-bundle" "build-tools;33.0.0"'
 
       - name: Run './build.cmd CiGithubActionsLinux'
-        run: cd nowy_ui; ./build.cmd CiGithubActionsLinux
+        run: cd nowy_ui; export PATH="$PATH:$HOME/.dotnet/tools"; ./build.cmd CiGithubActionsLinux
         env:
           NuGetAzureDevOpsPassword: ${{ secrets.NUGET_AZUREDEVOPS_PASSWORD }}
 
