@@ -200,7 +200,7 @@ class Build : NukeBuild
                 {
                     DotNetTasks.DotNetNuGetPush(
                         _ => _
-                            .SetSource(nameof(NuGetOrgSource))
+                            .SetSource(NuGetOrgSource)
                             .SetApiKey(NuGetOrgApiKey)
                             .EnableSkipDuplicate()
                             .SetTargetPath(file)
