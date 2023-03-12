@@ -19,4 +19,11 @@
     <ProjectReference Include="..\Nowy.UI.Common\Nowy.UI.Common.csproj"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.3"/>
+    <PackageReference Include="System.Text.Json" Version="7.0.2"/>
+    <PackageReference Include="Nowy.Database.Contract" Version="1.0.2.230312655"/>
+    <PackageReference Include="Telerik.UI.for.Blazor" Version="4.0.1" />
+  </ItemGroup>
+
 </Project>
