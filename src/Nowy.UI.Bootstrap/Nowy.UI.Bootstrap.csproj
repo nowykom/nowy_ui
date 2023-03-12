@@ -30,7 +30,6 @@
 
   <ItemGroup>
     <Folder Include="resources\thirdparty" />
-    <Folder Include="wwwroot" />
   </ItemGroup>
 
   <Target Name="NodeInstall" Inputs="package.json" Outputs="$(NodeModulesStampFile)">
