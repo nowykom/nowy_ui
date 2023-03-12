@@ -44,6 +44,9 @@ class Build : NukeBuild
     string NuGetAzureDevOpsUser => "schulz-dev";
     [Parameter] [Secret] string NuGetAzureDevOpsPassword;
 
+    string NuGetOrgSource => "https://api.nuget.org/v3/index.json";
+    [Parameter] [Secret] string NuGetOrgApiKey;
+
     protected override void OnBuildInitialized()
     {
         /*
@@ -179,6 +182,21 @@ class Build : NukeBuild
                         .SetTargetPath(file)
                         .SetProcessWorkingDirectory(ArtifactsDirectory)
                 );
+            }
+
+            if (!string.IsNullOrEmpty(NuGetOrgApiKey))
+            {
+                foreach (AbsolutePath file in ArtifactsDirectory.GlobFiles("*.nupkg"))
+                {
+                    DotNetTasks.DotNetNuGetPush(
+                        _ => _
+                            .SetSource(nameof(NuGetOrgSource))
+                            .SetApiKey(NuGetOrgApiKey)
+                            .EnableSkipDuplicate()
+                            .SetTargetPath(file)
+                            .SetProcessWorkingDirectory(ArtifactsDirectory)
+                    );
+                }
             }
         });
 
