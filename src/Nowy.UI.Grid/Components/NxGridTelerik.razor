@@ -1,0 +1,164 @@
+@using System.Collections.Immutable
+@using Microsoft.AspNetCore.Components
+@using Nowy.Database.Contract.Models
+@using Telerik.Blazor
+@using Telerik.Blazor.Components
+@using Telerik.FontIcons
+@typeparam TItem where TItem : class, Nowy.Database.Contract.Models.IBaseModel
+@inject IJSRuntime _js
+@inject BrowserService _browser
+@implements IAsyncDisposable
+
+<!--
+<TelerikGrid Class="grid"
+             Data="@(Items)"
+             OnUpdate="@UpdateHandler"
+             OnDelete="@DeleteHandler"
+             OnCreate="@CreateHandler"
+             ConfirmDelete="true"
+             Pageable="true"
+             Groupable="true"
+             Sortable="true"
+             FilterMode="GridFilterMode.FilterMenu"
+             Resizable="true"
+             Reorderable="true"
+             EditMode="GridEditMode.Popup"
+             SelectionMode="GridSelectionMode.Multiple"
+             OnStateInit="@((GridStateEventArgs<TItem> args) => OnStateInit(args))"
+             PageSize="10"
+             Navigable="true">
+    <GridColumns>
+        <GridCheckboxColumn></GridCheckboxColumn>
+        <GridColumn Field="@nameof(IBaseModel.uuid)" Width="120px" Title="uuid" TextAlign="@ColumnTextAlign.Left">
+            <Template>
+                @((context as TItem)?.uuid)
+            </Template>
+        </GridColumn>
+
+        foreach (GridField<TItem> VARIABLE in FieldCollection.Fields)
+        {
+
+        }
+        !--
+        <GridColumn Field="xxx" Title="Product Name" Width="195px"/> <GridColumn Field="xxx" Title="Quantity Per Unit" Width="200px"/>
+        --
+        <GridCommandColumn Width="260px">
+            <GridCommandButton Command="Edit" Icon="@FontIcon.Pencil" ThemeColor="@ThemeConstants.Button.ThemeColor.Primary">Edit</GridCommandButton>
+            <GridCommandButton Command="Delete" Icon="@FontIcon.Trash">Delete</GridCommandButton>
+        </GridCommandColumn>
+    </GridColumns>
+    <GridToolBarTemplate>
+        <GridCommandButton Command="Add" Icon="@FontIcon.Plus">Add Product</GridCommandButton>
+    </GridToolBarTemplate>
+</TelerikGrid>
+-->
+
+@code {
+
+    private IJSInProcessObjectReference? _module;
+
+    [Parameter]
+    public IReadOnlyList<TItem>? Items { get; set; }
+
+    [Parameter]
+    public Func<TItem, Task>? SaveItemAsync { get; set; }
+
+    [Parameter]
+    public GridFieldCollection<TItem>? FieldCollection { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        _module = await _js.InvokeAsync<IJSInProcessObjectReference>("import", "./_content/Nowy.Framework.Blazor/output/Components/NxGridTelerik.js?v=1");
+        _browser.WindowResized += _handleWindowResized;
+        _browser.IntersectionChanged += _handleIntersectionChanged;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _browser.WindowResized -= _handleWindowResized;
+        _browser.IntersectionChanged -= _handleIntersectionChanged;
+
+        await (_module?.DisposeAsync() ?? ValueTask.CompletedTask);
+        _module = null;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+        }
+
+        if (_module is not null)
+        {
+        }
+    }
+
+    private void _handleIntersectionChanged(object? sender, BrowserIntersectionChangedEventArgs e)
+    {
+        _updateTableSizeAsync().Forget();
+    }
+
+    private void _handleWindowResized(object? sender, BrowserWindowResizedEventArgs e)
+    {
+        _updateTableSizeAsync().Forget();
+    }
+
+    private async Task _updateTableSizeAsync()
+    {
+        StateHasChanged();
+    }
+
+    private async Task _saveItemAsync(TItem row)
+    {
+        StateHasChanged();
+        await (SaveItemAsync?.Invoke(row) ?? Task.CompletedTask);
+        StateHasChanged();
+    }
+
+
+    private void OnStateInit(GridStateEventArgs<TItem> args)
+    {
+    /*
+        args.GridState.GroupDescriptors = new List<GroupDescriptor>()
+        {
+            new GroupDescriptor()
+            {
+                Member = nameof(TItem.CategoryId),
+                MemberType = typeof(int)
+            }
+        };
+        */
+    }
+
+    public void UpdateHandler(GridCommandEventArgs args)
+    {
+        TItem? product = (TItem)args.Item;
+    // product.CategoryName = Categories.FirstOrDefault(c => c.CategoryId == product.CategoryId)?.CategoryName;
+    // ProductService.UpdateProduct(product);
+        LoadData();
+    }
+
+    public void DeleteHandler(GridCommandEventArgs args)
+    {
+    // ProductService.DeleteProduct((TItem)args.Item);
+        LoadData();
+    }
+
+    public void CreateHandler(GridCommandEventArgs args)
+    {
+        TItem? product = (TItem)args.Item;
+    // product.CategoryName = Categories.FirstOrDefault(c => c.CategoryId == product.CategoryId)?.CategoryName;
+    // ProductService.CreateProduct(product);
+        LoadData();
+    }
+
+    private void LoadData()
+    {
+    }
+
+}

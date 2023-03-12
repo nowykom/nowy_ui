@@ -1,0 +1,473 @@
+@using System.Collections.Immutable
+@typeparam TItem where TItem : class, Nowy.Database.Contract.Models.IBaseModel
+@inject IJSRuntime _js
+@inject BrowserService _browser
+@implements IAsyncDisposable
+
+<div @ref="_element_wrapper"
+     class="lr-flex-fill-column w-100"
+     style="@(StyleTable); @(_variables_for_width_initial)">
+
+@if (Items is { } && FieldCollection is { })
+{
+    <!--
+    <div class="table-responsive" style="overflow-x: auto; @(StyleTable)">
+    -->
+
+    <div @ref="_element_table" class="lr-grid">
+
+        <div @ref="_element_thead" class="lr-grid-head">
+            @for (int pretitle_index = 0; pretitle_index < FieldCollection.GetPreTitleCount(); pretitle_index++)
+            {
+                int colspan_to_use_up = 0;
+
+                <div class="lr-grid-row">
+                    @foreach (IReadOnlyList<NxGridField<TItem>> fields_in_span in FieldCollection.GetFieldsGroupedBySpan(pretitle_index: pretitle_index))
+                    {
+                        NxGridField<TItem> field_first_in_span = fields_in_span.First();
+                        string width_style = $"calc({fields_in_span.Select(f => $"var(--width-col-{f.Index})").Join(" + ")})";
+
+                        <div class="lr-grid-cell-head @(field_first_in_span.Classes)" style="min-width: @(width_style); max-width: @(width_style); @(fields_in_span.Count != 1 ? "text-align: center;" : "")">
+                            @(field_first_in_span.GetPreTitle(pretitle_index))
+                        </div>
+                    }
+                </div>
+            }
+            @for (int title_index = 0; title_index < FieldCollection.GetTitleCount(); title_index++)
+            {
+                <div class="lr-grid-row">
+                    @foreach (NxGridField<TItem> field in FieldCollection.Fields)
+                    {
+                        string width_style = $"var(--width-col-{field.Index})";
+
+                        <div class="lr-grid-cell-head @(field.Classes)" style="min-width: @(width_style); max-width: @(width_style);">
+                            @(field.GetTitle(title_index))
+                        </div>
+                    }
+                </div>
+            }
+            @for (int posttitle_index = 0; posttitle_index < FieldCollection.GetPostTitleCount(); posttitle_index++)
+            {
+                <div class="lr-grid-row">
+                    @foreach (NxGridField<TItem> field in FieldCollection.Fields)
+                    {
+                        string width_style = $"var(--width-col-{field.Index})";
+
+                        <div class="lr-grid-cell-head @(field.Classes)" style="min-width: @(width_style); max-width: @(width_style);">
+                            @(field.GetPostTitle(posttitle_index))
+                        </div>
+                    }
+                </div>
+            }
+            @if (FieldCollection.Fields.Any(f => f.Filter != GridFilter.NONE))
+            {
+                <div class="lr-grid-row">
+                    @foreach (NxGridField<TItem> field in FieldCollection.Fields)
+                    {
+                        string width_style = $"var(--width-col-{field.Index})";
+
+                        <div class="lr-grid-cell-head @(field.Classes) filter" style="min-width: @(width_style); max-width: @(width_style);">
+                            <input type="text"
+                                   class="lr-grid-input"
+                                   @bind:get="@(_getFieldFilterValue(field))"
+                                   @bind:set="@((string value) => { _setFieldFilterValue(field, value); })"
+                                   @bind:event="oninput"/>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <div @ref="_element_tbody" class="lr-grid-body">
+            <Virtualize Items="@_getFilteredRows()" Context="row" TItem="TItem" ItemSize="30" SpacerElement="div">
+                @{
+                    bool row_is_selected = _isRowSelected(row);
+                }
+
+                <div class="lr-grid-row @(row_is_selected ? "table-info" : "")"
+                     @onclick:preventDefault
+                     @onclick:stopPropagation>
+
+                    @foreach (NxGridField<TItem> field in FieldCollection.Fields)
+                    {
+                        bool cell_is_editable = !field.IsReadonly;
+                        bool cell_is_visible = field.CellVisible?.Invoke(row) ?? true;
+                        string width_style = $"var(--width-col-{field.Index})";
+
+                        <div class="lr-grid-cell-body @(field.Classes) @(cell_is_editable ? "editable" : "")"
+                             style="min-width: @(width_style); max-width: @(width_style); visibility: @(cell_is_visible ? "visible" : "collapse");">
+
+                            @if (cell_is_editable)
+                            {
+                                if (field.Type == GridType.BUTTON_EDIT)
+                                {
+                                    if (false)
+                                    {
+                                        <i class="mdi mdi-content-save mdi-24px"
+                                           @onclick="@(async () => { /*await _setRowEditableAsync(row, false);*/ await _saveItemAsync(row); })"
+                                           @onclick:preventDefault
+                                           @onclick:stopPropagation>
+                                        </i>
+                                    }
+                                }
+                                else if (field.Type == GridType.CHECKBOX)
+                                {
+                                    if (field.GetValue(row) == "True")
+                                    {
+                                        <i class="mdi mdi-checkbox-marked mdi-24px"
+                                           @onclick="@(async () => { field.SetValue(row, false.ToString()); await _saveItemAsync(row); })"
+                                           @onclick:preventDefault
+                                           @onclick:stopPropagation>
+                                        </i>
+                                    }
+                                    else
+                                    {
+                                        <i class="mdi mdi-checkbox-blank-outline mdi-24px"
+                                           @onclick="@(async () => { field.SetValue(row, true.ToString()); await _saveItemAsync(row); })"
+                                           @onclick:preventDefault
+                                           @onclick:stopPropagation>
+                                        </i>
+                                    }
+                                }
+                                else if (field.IsMultiple)
+                                {
+                                    if (field.Type == GridType.SELECT)
+                                    {
+                                        <NxSelectMultiple Class="lr-grid-input"
+                                                          @bind-Value:get="@(field.GetValues(row).ToList())"
+                                                          @bind-Value:set="@(async (List<string> value) => { field.SetValues(row, value.ToArray()); await _saveItemAsync(row); })"
+                                                          DialogTitle="@(field.Title)"
+                                                          Options="@(field.Options)">
+                                            @(field.GetTitle(row)) <span>&nbsp;</span>
+                                        </NxSelectMultiple>
+                                    }
+                                    else
+                                    {
+                                        <NxInputMultiple Class="lr-grid-input"
+                                                         @bind-Value:get="@(field.GetValues(row).ToList())"
+                                                         @bind-Value:set="@(async (List<string> value) => { field.SetValues(row, value.ToArray()); await _saveItemAsync(row); })"
+                                                         DialogTitle="@(field.Title)">
+                                            @(field.GetTitle(row)) <span>&nbsp;</span>
+                                        </NxInputMultiple>
+                                    }
+                                }
+                                else
+                                {
+                                    if (field.Type == GridType.SELECT)
+                                    {
+                                        <NxSelectSingle Class="lr-grid-input"
+                                                        @bind-Value:get="@(field.GetValue(row))"
+                                                        @bind-Value:set="@(async (string value) => { field.SetValue(row, value); await _saveItemAsync(row); })"
+                                                        DialogTitle="@(field.Title)"
+                                                        Options="@(field.Options)">
+                                            @(field.GetTitle(row))
+                                            <span>&nbsp;</span>
+                                        </NxSelectSingle>
+                                    }
+                                    else
+                                    {
+                                        <input type="text"
+                                               class="lr-grid-input"
+                                               @bind:get="@(field.GetValue(row))"
+                                               @bind:set="@(async (string value) => { field.SetValue(row, value); await _saveItemAsync(row); })"/>
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (field.Type == GridType.BUTTON_EDIT)
+                                {
+                                    if (false)
+                                    {
+                                        <i class="mdi mdi-pencil mdi-24px"
+                                           @onclick="@(async () => { /*await _setRowEditableAsync(row, true);*/ })"
+                                           @onclick:preventDefault
+                                           @onclick:stopPropagation>
+                                        </i>
+                                    }
+                                }
+                                else if (field.Type == GridType.CHECKBOX)
+                                {
+                                    if (field.GetValue(row) == "True")
+                                    {
+                                        <i class="mdi mdi-checkbox-marked mdi-24px text-dark"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="mdi mdi-checkbox-blank-outline mdi-24px text-dark"></i>
+                                    }
+                                }
+                                else
+                                {
+                                    @(field.GetTitle(row))
+                                    <span>&nbsp;</span>
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+            </Virtualize>
+        </div>
+
+    </div>
+
+    <!--
+    </div>
+    -->
+
+    @if (PaginationData.TotalPages != 1)
+    {
+        <CascadingValue Value="this" Name="@nameof(NxGrid<TItem>)">
+            <div style="display: flex; justify-content: space-around;">
+                <GridPagination TItem="TItem" PaginationData="PaginationData">
+                </GridPagination>
+            </div>
+        </CascadingValue>
+    }
+}
+</div>
+
+@code {
+
+    private IJSInProcessObjectReference? _module;
+
+    private ElementReference _element_wrapper;
+    private ElementReference _element_wrapper_initialized;
+    private ElementReference _element_table;
+    private ElementReference _element_table_initialized;
+    private ElementReference _element_thead;
+    private ElementReference _element_thead_initialized;
+    private ElementReference _element_tbody;
+    private ElementReference _element_tbody_initialized;
+
+    [Parameter]
+    public string? StyleTable { get; set; }
+
+    [Parameter]
+    public string? Height { get; set; } = "calc(100vh - 240px)";
+
+    [Parameter]
+    public IReadOnlyList<TItem>? Items { get; set; }
+
+    [Parameter]
+    public Func<TItem, Task>? SaveItemAsync { get; set; }
+
+    [Parameter]
+    public GridFieldCollection<TItem>? FieldCollection { get; set; }
+
+    [Parameter]
+    public int PageSize { get; set; } = 0;
+
+    public int Page { get; set; } = 0;
+
+
+    private (IReadOnlyList<TItem>? items, int page, int page_size, ImmutableDictionary<string, string?> filter_values) _previous_source_filtered_rows;
+    private List<TItem>? _previous_result_filtered_rows;
+    private HashSet<string> _selected_row_uuids = new();
+    private ImmutableDictionary<string, string?> _filter_values = ImmutableDictionary<string, string?>.Empty;
+    private bool _render_grid_data = false;
+
+    public NxGridPagination<TItem>.Data PaginationData { get; } = new();
+
+    private string? _variables_for_width_initial => FieldCollection?.Fields.Select((f, i) => $"--width-col-{i}: {f.WidthStyleValue};").Join(" ");
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        _module = await _js.InvokeAsync<IJSInProcessObjectReference>("import", "./_content/Nowy.Framework.Blazor/output/Components/NxGrid.js?v=1");
+        _browser.WindowResized += _handleWindowResized;
+        _browser.IntersectionChanged += _handleIntersectionChanged;
+
+        PaginationData.Grid = this;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _browser.WindowResized -= _handleWindowResized;
+        _browser.IntersectionChanged -= _handleIntersectionChanged;
+
+        await (_module?.DisposeAsync() ?? ValueTask.CompletedTask);
+        _module = null;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+        }
+
+        if (_module is not null)
+        {
+            if (_element_wrapper_initialized.Id != _element_wrapper.Id || _element_table_initialized.Id != _element_table.Id || _element_thead_initialized.Id != _element_thead.Id || _element_tbody_initialized.Id != _element_tbody.Id)
+            {
+                _element_wrapper_initialized = _element_wrapper;
+                _element_table_initialized = _element_table;
+                _element_thead_initialized = _element_thead;
+                _element_tbody_initialized = _element_tbody;
+
+                _updateTableSizeAsync().Forget();
+            }
+
+            _module.Invoke<string>("table_size_info", args: new object?[]
+            {
+                _element_wrapper,
+                _element_table,
+                _element_thead,
+                _element_tbody,
+            });
+        }
+    }
+
+    private void _handleIntersectionChanged(object? sender, BrowserIntersectionChangedEventArgs e)
+    {
+        _updateTableSizeAsync().Forget();
+    }
+
+    private void _handleWindowResized(object? sender, BrowserWindowResizedEventArgs e)
+    {
+        _updateTableSizeAsync().Forget();
+    }
+
+    private async Task _updateTableSizeAsync()
+    {
+        Console.WriteLine($"_module = {_module}, _element_table = {_element_table}, _element_thead = {_element_thead}, _element_tbody = {_element_tbody}");
+
+        if (_module is null)
+            return;
+
+        if (string.IsNullOrEmpty(_element_wrapper.Id))
+            return;
+        if (string.IsNullOrEmpty(_element_table.Id))
+            return;
+        if (string.IsNullOrEmpty(_element_thead.Id))
+            return;
+        if (string.IsNullOrEmpty(_element_tbody.Id))
+            return;
+
+        _module.Invoke<string>("table_size_update", args: new object?[]
+        {
+            _element_wrapper,
+            _element_table,
+            _element_thead,
+            _element_tbody,
+        });
+
+        _render_grid_data = true;
+        StateHasChanged();
+    }
+
+    private List<TItem>? _getFilteredRows()
+    {
+        if (!_render_grid_data)
+        {
+            return new();
+        }
+
+        (IReadOnlyList<TItem>? items, int page, int page_size, ImmutableDictionary<string, string?> filter_values) source_filtered_rows
+            = (Items, Page, PageSize, _filter_values);
+        if (object.ReferenceEquals(source_filtered_rows.items, _previous_source_filtered_rows.items)
+            && source_filtered_rows.page == _previous_source_filtered_rows.page
+            && source_filtered_rows.page_size == _previous_source_filtered_rows.page_size
+            && source_filtered_rows.filter_values == _previous_source_filtered_rows.filter_values)
+        {
+            return _previous_result_filtered_rows;
+        }
+
+        IEnumerable<TItem> query = Items ?? Array.Empty<TItem>();
+
+        if (PaginationData.TotalPages != 1 && PageSize > 0)
+        {
+            query = query.Skip(Page * PageSize).Take(PageSize);
+        }
+
+        foreach ((string field_name, string? filter_value) in _filter_values)
+        {
+            NxGridField<TItem>? field = FieldCollection.Fields.FirstOrDefault(f => f.Name == field_name);
+            if (field is { })
+            {
+                query = query.Where(o => (field.GetValue(o, null) ?? string.Empty).Contains(filter_value ?? string.Empty, StringComparison.CurrentCultureIgnoreCase));
+            }
+        }
+
+        query = query.Take(500);
+
+        List<TItem> ret = query.ToList();
+
+        _previous_source_filtered_rows = source_filtered_rows;
+        _previous_result_filtered_rows = ret;
+
+        return ret;
+    }
+
+    private async Task _saveItemAsync(TItem row)
+    {
+        StateHasChanged();
+        await (SaveItemAsync?.Invoke(row) ?? Task.CompletedTask);
+        StateHasChanged();
+    }
+
+    private bool _isRowSelected(TItem row)
+    {
+        return _selected_row_uuids.Contains(row.uuid);
+    }
+
+    /*
+    private bool _isRowEditable(TItem row)
+    {
+        return _editable_row_uuids.Contains(row.uuid);
+    }
+
+    private async Task _setRowEditableAsync(TItem? row, bool value)
+    {
+        if (value)
+        {
+            foreach (string uuid in _editable_row_uuids)
+            {
+                if (uuid != row?.uuid)
+                {
+                    TItem? item = Items?.FirstOrDefault(o => o.uuid == uuid);
+                    if (item is not null)
+                    {
+                        await _saveItemAsync(row);
+                    }
+                }
+            }
+            _editable_row_uuids.Clear();
+            if (row is not null)
+            {
+                _editable_row_uuids.Add(row.uuid);
+            }
+        }
+        else
+        {
+            if (row is not null)
+            {
+                _editable_row_uuids.Remove(row.uuid);
+            }
+        }
+        StateHasChanged();
+    }
+    */
+
+    private string? _getFieldFilterValue(NxGridField<TItem> field)
+    {
+        return _filter_values.Get(field.Name ?? string.Empty, string.Empty);
+    }
+
+    private void _setFieldFilterValue(NxGridField<TItem> field, string? value)
+    {
+        if (!string.IsNullOrEmpty(value))
+        {
+            _filter_values = _filter_values.SetItem(field.Name ?? string.Empty, value);
+        }
+        else
+        {
+            _filter_values = _filter_values.Remove(field.Name ?? string.Empty);
+        }
+        StateHasChanged();
+    }
+
+}

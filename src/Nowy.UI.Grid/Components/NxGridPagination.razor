@@ -1,0 +1,109 @@
+@typeparam TItem where TItem : class, Nowy.Database.Contract.Models.IBaseModel
+
+<ul class="pagination" style="padding-top: 1rem; padding-bottom: 0;">
+    <li class="page-item @(Page - 1 >= 0 ? "" : "disabled")">
+        <a class="page-link" onclick=@(() => Page = (Page - 1)) @onclick:preventDefault>Previous</a>
+    </li>
+    @if (0 < TotalPages && Page - 2 > 0)
+    {
+        <li class="page-item">
+            <a class="page-link" onclick=@(() => Page = 0) @onclick:preventDefault>@(FormatPageIndex(0))</a>
+        </li>
+    }
+    @if (1 < TotalPages && Page - 2 > 1)
+    {
+        <li class="page-item">
+            <a class="page-link" onclick=@(() => Page = 1) @onclick:preventDefault>@(FormatPageIndex(1))</a>
+        </li>
+    }
+    @if (Page - 2 >= 0)
+    {
+        <li class="page-item">
+            <a class="page-link" onclick=@(() => Page = (Page - 2)) @onclick:preventDefault>@(FormatPageIndex(Page - 2))</a>
+        </li>
+    }
+    @if (Page - 1 >= 0)
+    {
+        <li class="page-item">
+            <a class="page-link" onclick=@(() => Page = (Page - 1)) @onclick:preventDefault>@(FormatPageIndex(Page - 1))</a>
+        </li>
+    }
+    <li class="page-item active" aria-current="page">
+        <a class="page-link" href="#">
+            @(FormatPageIndex(Page))
+            <span class="visually-hidden">(current)</span>
+        </a>
+    </li>
+    @if (Page + 1 < TotalPages)
+    {
+        <li class="page-item">
+            <a class="page-link" onclick=@(() => Page = (Page + 1)) @onclick:preventDefault>@(FormatPageIndex(Page + 1))</a>
+        </li>
+    }
+    @if (Page + 2 < TotalPages)
+    {
+        <li class="page-item">
+            <a class="page-link" onclick=@(() => Page = (Page + 2)) @onclick:preventDefault>@(FormatPageIndex(Page + 2))</a>
+        </li>
+    }
+    @if (Page + 2 < TotalPages - 2)
+    {
+        <li class="page-item">
+            <a class="page-link" onclick=@(() => Page = (TotalPages - 2)) @onclick:preventDefault>@(FormatPageIndex(TotalPages - 2))</a>
+        </li>
+    }
+    @if (Page + 2 < TotalPages - 1)
+    {
+        <li class="page-item">
+            <a class="page-link" onclick=@(() => Page = (TotalPages - 1)) @onclick:preventDefault>@(FormatPageIndex(TotalPages - 1))</a>
+        </li>
+    }
+    <li class="page-item @(Page + 1 < TotalPages ? "" : "disabled")">
+        <a class="page-link" onclick=@(() => Page = (Page + 1)) @onclick:preventDefault>Next</a>
+    </li>
+</ul>
+
+@code {
+
+    [Parameter]
+    public Data PaginationData { get; set; } = new();
+
+    public int Page
+    {
+        get => PaginationData.Page;
+        set
+        {
+            PaginationData.Page = value;
+            StateHasChanged();
+        }
+    }
+
+    public int TotalPages => PaginationData.TotalPages;
+    public int TotalCount => PaginationData.TotalCount;
+
+    public sealed class Data
+    {
+        public NxGrid<TItem>? Grid { get; set; }
+
+        public int PageSize => Grid?.PageSize ?? -1;
+
+        public int Page
+        {
+            get => Grid?.Page ?? 1;
+            set
+            {
+                if (Grid is { })
+                {
+                    Grid.Page = value;
+                }
+            }
+        }
+
+        public int TotalPages => (TotalCount == 0 || PageSize == 0) ? 1 : (int)Math.Ceiling((double)TotalCount / (double)PageSize);
+        public int TotalCount => Grid?.Items?.Count ?? 0;
+    }
+
+    private string FormatPageIndex(int value) => $"{value + 1:0}";
+
+
+}

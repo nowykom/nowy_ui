@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nowy.UI.Bootstrap", "Nowy.UI.Bootstrap\Nowy.UI.Bootstrap.csproj", "{BC56EB23-285E-4CFF-A79B-5C53CFCD73DE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "..\_build\_build.csproj", "{DB8011E1-5ED3-42B7-8A92-A239C6FC0D9F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "..\nukebuild\_build.csproj", "{DB8011E1-5ED3-42B7-8A92-A239C6FC0D9F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nowy.UI.Layout", "Nowy.UI.Layout\Nowy.UI.Layout.csproj", "{13C502C0-DAA3-4AE2-8E3D-5587B9A90EAF}"
 EndProject
