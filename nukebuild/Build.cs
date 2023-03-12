@@ -30,7 +30,7 @@ class Build : NukeBuild
     [GitRepository] readonly GitRepository GitRepository;
     [Solution] readonly Solution Solution;
 
-    public static int Main() => Execute<Build>(x => x.Compile);
+    public static int Main() => Execute<Build>(x => x.Upgrade, x => x.Compile);
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
@@ -92,8 +92,7 @@ class Build : NukeBuild
             }
 
 
-            DotNetTasks.DotNet("outdated --upgrade");
-
+            DotNetTasks.DotNet("outdated --upgrade", RootDirectory / "src");
         });
 
     Target Clean => _ => _
