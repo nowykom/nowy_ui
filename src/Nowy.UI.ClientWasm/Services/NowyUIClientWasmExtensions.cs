@@ -28,4 +28,14 @@ public static class NowyUIClientWasmExtensions
         builder.Services.AddSingleton<FileService>(sp => new WasmFileService(sp.GetRequiredService<IJSRuntime>(), sp.GetRequiredService<ILogger<WasmFileService>>()));
         builder.Services.AddSingleton<BrowserService>(sp => new BrowserService(sp.GetRequiredService<IJSRuntime>()));
     }
+
+    public static void UseNowyUIClientWasm(this WebAssemblyHost host, string? app_name = null, string? app_title = null, string? app_version = null)
+    {
+        StandardApp.Services = host.Services;
+
+        StandardApp.AppName = app_name ?? StandardApp.AppName;
+        StandardApp.AppVersion = app_version ?? StandardApp.AppVersion;
+        StandardApp.AppTitle = app_title ?? StandardApp.AppTitle;
+    }
+
 }
