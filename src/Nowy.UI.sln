@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nowy.UI.Layout", "Nowy.UI.L
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nowy.UI.Grid", "Nowy.UI.Grid\Nowy.UI.Grid.csproj", "{C92E5B35-591E-4918-B71D-7203456A3362}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nowy.UI.Common", "Nowy.UI.Common\Nowy.UI.Common.csproj", "{4128ECBB-EB40-41EE-8175-7507B83254DA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,5 +30,9 @@ Global
 		{C92E5B35-591E-4918-B71D-7203456A3362}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C92E5B35-591E-4918-B71D-7203456A3362}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C92E5B35-591E-4918-B71D-7203456A3362}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4128ECBB-EB40-41EE-8175-7507B83254DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4128ECBB-EB40-41EE-8175-7507B83254DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4128ECBB-EB40-41EE-8175-7507B83254DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4128ECBB-EB40-41EE-8175-7507B83254DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

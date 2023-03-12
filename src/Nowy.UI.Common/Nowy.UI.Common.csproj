@@ -7,16 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <SupportedPlatform Include="browser"/>
+    <PackageReference Include="Nowy.Standard" Version="7.1.4157.230312060"/>
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="System.Collections.ObjectModel"/>
-    <Using Include="Nowy.Standard"/>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Nowy.UI.Common\Nowy.UI.Common.csproj" />
+    <Using Include="System.Collections.ObjectModel" />
+    <Using Include="Nowy.Standard" />
   </ItemGroup>
 
 </Project>

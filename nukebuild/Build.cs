@@ -69,6 +69,33 @@ class Build : NukeBuild
         Log.Information("Configuration:\t{Configuration}", Configuration);
     }
 
+    Target Upgrade => _ => _
+        .Before(Restore)
+        .Executes(() =>
+        {
+// dotnet tool install --global dotnet-outdated-tool
+            try
+            {
+                DotNetTasks.DotNetToolInstall(
+                    _ => _
+                        .SetPackageName("dotnet-outdated-tool")
+                        .EnableGlobal()
+                );
+            }
+            catch (Exception)
+            {
+                DotNetTasks.DotNetToolUpdate(
+                    _ => _
+                        .SetPackageName("dotnet-outdated-tool")
+                        .EnableGlobal()
+                );
+            }
+
+
+            DotNetTasks.DotNet("outdated --upgrade");
+
+        });
+
     Target Clean => _ => _
         .Before(Restore)
         .Executes(() =>
@@ -158,6 +185,9 @@ class Build : NukeBuild
         });
 
 
+    Target Pack => _ => _
+        .DependsOn(Upgrade, CreateNugetPackages);
+
     Target CiGithubActionsLinux => _ => _
-        .DependsOn(CreateNugetPackages);
+        .DependsOn(Upgrade, CreateNugetPackages);
 }

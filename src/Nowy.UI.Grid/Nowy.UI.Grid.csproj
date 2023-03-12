@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -7,11 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <SupportedPlatform Include="browser" />
+    <SupportedPlatform Include="browser"/>
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="System.Collections.ObjectModel" />
+    <Using Include="System.Collections.ObjectModel"/>
+    <Using Include="Nowy.Standard"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nowy.UI.Common\Nowy.UI.Common.csproj"/>
   </ItemGroup>
 
 </Project>
