@@ -6,6 +6,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <Import Project="..\common\Webpack.props" />
+  <Import Project="..\common\Webpack.targets" />
+
   <ItemGroup>
     <SupportedPlatform Include="browser" />
   </ItemGroup>

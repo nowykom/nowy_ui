@@ -1,0 +1,51 @@
+<Project>
+
+  <Target Name="NodeInstall" Inputs="package.json" Outputs="$(NodeModulesStampFile)">
+    <!--
+        Use npm install or npm ci depending on RestorePackagesWithLockFile value.
+        Uncomment the following lines if you want to use this feature:
+
+        <PropertyGroup>
+          <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        </PropertyGroup>
+     -->
+    <Exec Command="npm ci" Condition="'$(RestorePackagesWithLockFile)' == 'true'" />
+    <Exec Command="npm install" Condition="'$(RestorePackagesWithLockFile)' != 'true'" />
+
+    <!-- Write the stamp file, so incremental builds work -->
+    <Touch Files="$(NodeModulesStampFile)" AlwaysCreate="true" />
+  </Target>
+
+  <Target Name="NodeCompileFindFiles" DependsOnTargets="NodeInstall">
+    <ItemGroup>
+      <_NodeCompileInputs Include="Components\**\*.ts" />
+      <_NodeCompileInputs Include="Components\**\*.js" />
+      <_NodeCompileInputs Include="Components\**\*.scss" />
+      <_NodeCompileInputs Include="Services\**\*.ts" />
+      <_NodeCompileInputs Include="Services\**\*.js" />
+      <_NodeCompileInputs Include="Services\**\*.scss" />
+    </ItemGroup>
+    <Message Text="_NodeCompileInputs: @(_NodeCompileInputs)" />
+  </Target>
+
+  <Target Name="NodeCompile" DependsOnTargets="NodeCompileFindFiles" Inputs="@(_NodeCompileInputs)" Outputs="$(IntermediateOutputPath)_NodeCompile.stamp">
+    <Exec Command="npx webpack --config ../common/webpack.config.js" />
+    <Exec Command="npx tsc -p tsconfig.razor.json" />
+    <Exec Command="npx tsc -p tsconfig.services.json" />
+
+    <MakeDir Directories="$(IntermediateOutputPath)" />
+    <Touch Files="$(IntermediateOutputPath)_NodeCompile.stamp" AlwaysCreate="True" />
+    <ItemGroup>
+      <FileWrites Include="$(IntermediateOutputPath)_NodeCompile.stamp" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="NodeCleanCss" DependsOnTargets="NodeCompile">
+    <ItemGroup>
+      <_CleanCssInputs Include="wwwroot\output\**\*.css" Exclude="wwwroot\output\**\*.min.css" />
+    </ItemGroup>
+    <Exec Command="npx cleancss -o %(_CleanCssInputs.RelativeDir)\%(_CleanCssInputs.Filename).min.css %(_CleanCssInputs.Identity) " />
+    <Move SourceFiles="%(_CleanCssInputs.RelativeDir)\%(_CleanCssInputs.Filename).min.css" DestinationFiles="%(_CleanCssInputs.RelativeDir)\%(_CleanCssInputs.Filename).css" />
+  </Target>
+
+</Project>

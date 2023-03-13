@@ -1,0 +1,15 @@
+<Project>
+
+  <ItemGroup>
+    <Content Include="..\common\Webpack.config.js">
+      <Link>Properties\Webpack-common.config.js</Link>
+    </Content>
+    <Content Include="..\common\Webpack.props">
+      <Link>Properties\Webpack.props</Link>
+    </Content>
+    <Content Include="..\common\Webpack.targets">
+      <Link>Properties\Webpack.targets</Link>
+    </Content>
+  </ItemGroup>
+
+</Project>

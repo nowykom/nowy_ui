@@ -7,7 +7,7 @@ public static class NowyUIBootstrapExtensions
 {
     public static void AddNowyUIBootstrap(this IServiceCollection services)
     {
-        services.AddSingleton<IWebAssetReferenceService, BootstrapWebAssetReferenceService>();
         services.AddSingleton<BootstrapWebAssetReferenceService>();
+        services.AddSingleton<IWebAssetReferenceService>(sp => sp.GetRequiredService<BootstrapWebAssetReferenceService>());
     }
 }
