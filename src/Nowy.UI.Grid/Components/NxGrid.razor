@@ -274,7 +274,7 @@
     {
         await base.OnInitializedAsync();
 
-        _module = await _js.InvokeAsync<IJSInProcessObjectReference>("import", "./_content/Nowy.Framework.Blazor/output/Components/NxGrid.razor.js?v=1");
+        _module = await _js.InvokeAsync<IJSInProcessObjectReference>("import", "./_content/Nowy.UI.Grid/output/Components/NxGrid.razor.js?v=1");
         _browser.WindowResized += _handleWindowResized;
         _browser.IntersectionChanged += _handleIntersectionChanged;
 

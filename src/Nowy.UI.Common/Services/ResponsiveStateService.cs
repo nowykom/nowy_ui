@@ -23,7 +23,7 @@ public class ResponsiveStateService
 
     public async Task InitAsync()
     {
-        this._module ??= await this._js.InvokeAsync<IJSInProcessObjectReference>("import", "./_content/Nowy.Framework.Blazor/output/Services/BrowserService.js");
+        this._module ??= await this._js.InvokeAsync<IJSInProcessObjectReference>("import", "./_content/Nowy.UI.Common/output/Services/BrowserService.js");
     }
 
     private void _handleWindowResized(object? sender, Common.Services.BrowserWindowResizedEventArgs e)
