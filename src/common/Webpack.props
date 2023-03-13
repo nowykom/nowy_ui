@@ -1,8 +1,21 @@
 <Project>
 
+  <PropertyGroup>
+    <NodeModulesStampFile>node_modules\_NodeModules.stamp</NodeModulesStampFile>
+    <NodeCompileStampDirectory>wwwroot\output</NodeCompileStampDirectory>
+    <NodeCompileComponentsStampFile>$(NodeCompileStampDirectory)\_NodeCompile.Components.stamp</NodeCompileComponentsStampFile>
+    <NodeCompileServicesStampFile>$(NodeCompileStampDirectory)\_NodeCompile.Services.stamp</NodeCompileServicesStampFile>
+    <NodeCompileResourcesStampFile>$(NodeCompileStampDirectory)\_NodeCompile.Resources.stamp</NodeCompileResourcesStampFile>
+
+    <PrepareForBuildDependsOn>
+      NodeCompile;
+      $(PrepareForBuildDependsOn)
+    </PrepareForBuildDependsOn>
+  </PropertyGroup>
+
   <ItemGroup>
-    <Content Include="..\common\Webpack.config.js">
-      <Link>Properties\Webpack-common.config.js</Link>
+    <Content Include="..\common\webpack.config.js">
+      <Link>Properties\webpack.config.js</Link>
     </Content>
     <Content Include="..\common\Webpack.props">
       <Link>Properties\Webpack.props</Link>

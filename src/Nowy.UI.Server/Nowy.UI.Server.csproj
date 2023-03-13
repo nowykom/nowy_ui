@@ -12,8 +12,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="7.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.3" />
-    <PackageReference Include="Nowy.Database.Client" Version="1.0.2.230312655" />
-    <PackageReference Include="Nowy.Database.Contract" Version="1.0.2.230312655" />
+    <PackageReference Include="Nowy.Database.Client" Version="1.0.2.230312947" />
+    <PackageReference Include="Nowy.Database.Contract" Version="1.0.2.230312947" />
   </ItemGroup>
 
   <ItemGroup>

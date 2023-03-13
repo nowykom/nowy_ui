@@ -1,132 +1,115 @@
-
 const fs = require('fs');
 const path = require('path');
+const glob = require('glob');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const {globSync} = require("glob");
 
-console.log(path.resolve(__dirname, 'wwwroot/output'));
+console.log(path.resolve(process.cwd(), 'wwwroot/output'));
 
 module.exports = function (env, {mode}) {
-    const production = mode === 'production';
+  const production = mode === 'production';
 
-    let entry_points = {};
-    entry_points[`init`] = [
-        path.resolve(__dirname, `resources/bundles/init.scss`),
-        path.resolve(__dirname, `resources/bundles/init.ts`),
-    ];
-    entry_points[`module-leaflet`] = [
-        path.resolve(__dirname, `resources/bundles/module-leaflet.ts`),
-    ];
+  let entry_points = {};
 
-    for (let theme of ['lr', 'ts', 'nowy',]) {
-        for (let framework of ['bootstrap5', 'bootstrap5-mdb', 'bootstrap5-fluentui',]) {
+  fs.mkdirSync(path.resolve(process.cwd(), 'resources/bundles/'), {recursive: true});
+  fs.writeFileSync(path.resolve(process.cwd(), 'resources/bundles/.keep'), new Uint8Array());
 
-            let path_bundle_scss = path.resolve(__dirname, `resources/bundles/bundle-${theme}-${framework}.scss`);
-            let path_bundle_ts = path.resolve(__dirname, `resources/bundles/bundle-${theme}-${framework}.ts`);
+  for (let file_path of glob.globSync(path.resolve(process.cwd(), `resources/bundles/*.ts`))) {
+    let entry_name = path.parse(file_path).name;
+    entry_points[entry_name] ??= [];
+    entry_points[entry_name].push(file_path);
+  }
+  for (let file_path of glob.globSync(path.resolve(process.cwd(), `resources/bundles/*.scss`))) {
+    let entry_name = path.parse(file_path).name;
+    entry_points[entry_name] ??= [];
+    entry_points[entry_name].push(file_path);
+  }
 
-            fs.writeFileSync(path_bundle_scss, `
-                @import "../leuchtraketen/theme-${theme}/_index";
-                @import "../leuchtraketen/common/telerik";
-                @import "../leuchtraketen/framework-${framework}/_index";
-                @import "../leuchtraketen/common/_index";
-                `.split("\n").map((item) => item.trim()).join("\n")
-            );
-            fs.writeFileSync(path_bundle_ts, `
-                import "../leuchtraketen/theme-${theme}/_index";
-                import "../leuchtraketen/framework-${framework}/_index";
-                import "../leuchtraketen/common/_index";
-                `.split("\n").map((item) => item.trim()).join("\n")
-            );
+  console.log(entry_points);
 
-            entry_points[`bundle-${theme}-${framework}`] = [
-                path_bundle_scss,
-                path_bundle_ts,
-            ];
-        }
-    }
+  return {
 
-    return {
+    node: {
+      global: false,
+      __filename: false,
+      __dirname: false,
+    },
 
-        node: {
-            global: false,
-            __filename: false,
-            __dirname: false,
-        },
+    mode: production ? 'production' : 'development',
+    devtool: production ? 'source-map' : 'inline-source-map',
+    entry: entry_points,
 
-        mode: production ? 'production' : 'development',
-        devtool: production ? 'source-map' : 'inline-source-map',
-        entry: entry_points,
+    output: {
+      path: path.resolve(__dirname, 'wwwroot/output'),
+      filename: '[name].js',
+      clean: true,
+      module: true,
+      library: {
+        type: "module",
+      },
+    },
 
-        output: {
-            path: path.resolve(__dirname, 'wwwroot/output'),
-            filename: '[name].js',
-            clean: true,
-            module: true,
-            library: {
-                type: "module",
+    experiments: {
+      outputModule: true,
+    },
+
+    resolve: {
+      extensions: ['.ts', '.js'],
+      modules: ['resources', 'node_modules'],
+      plugins: [new TsconfigPathsPlugin({
+        configFile: path.resolve(__dirname, 'tsconfig.webpack.json'),
+      })]
+    },
+
+    module: {
+      rules: [
+        {
+          test: /\.s[ac]ss$/i,
+          use: [
+            // Creates `style` nodes from JS strings
+            MiniCssExtractPlugin.loader, // production ? MiniCssExtractPlugin.loader : "style-loader",
+            // Translates CSS into CommonJS
+            {
+              loader: 'css-loader',
+              options: {
+                url: true,
+                sourceMap: true,
+              }
             },
+            {
+              loader: 'resolve-url-loader',
+              options: {
+                sourceMap: true,
+              }
+            },
+            // Compiles Sass to CSS
+            {
+              loader: 'sass-loader',
+              options: {
+                sourceMap: true, // <-- !!IMPORTANT!!
+              }
+            },
+          ],
         },
+        {
+          test: /\.ts$/i,
+          use: [
+            {
+              loader: 'ts-loader',
+              options: {
+                configFile: "tsconfig.webpack.json"
+              }
+            }
+          ],
+          exclude: /node_modules/
+        }
+      ]
+    },
 
-        experiments: {
-            outputModule: true,
-        },
+    plugins: [
+      new MiniCssExtractPlugin(),
+    ],
 
-        resolve: {
-            extensions: ['.ts', '.js'],
-            modules: ['resources', 'node_modules'],
-            plugins: [new TsconfigPathsPlugin({
-                configFile: path.resolve(__dirname, 'tsconfig.webpack.json'),
-            })]
-        },
-
-        module: {
-            rules: [
-                {
-                    test: /\.s[ac]ss$/i,
-                    use: [
-                        // Creates `style` nodes from JS strings
-                        MiniCssExtractPlugin.loader, // production ? MiniCssExtractPlugin.loader : "style-loader",
-                        // Translates CSS into CommonJS
-                        {
-                            loader: 'css-loader',
-                            options: {
-                                url: true,
-                                sourceMap: true,
-                            }
-                        },
-                        {
-                            loader: 'resolve-url-loader',
-                            options: {
-                                sourceMap: true,
-                            }
-                        },
-                        // Compiles Sass to CSS
-                        {
-                            loader: 'sass-loader',
-                            options: {
-                                sourceMap: true, // <-- !!IMPORTANT!!
-                            }
-                        },
-                    ],
-                },
-                {
-                    test: /\.ts$/i,
-                    use: [
-                        {
-                            loader: 'ts-loader',
-                            options: {
-                                configFile: "tsconfig.webpack.json"
-                            }
-                        }
-                    ],
-                    exclude: /node_modules/
-                }
-            ]
-        },
-
-        plugins: [
-            new MiniCssExtractPlugin(),
-        ],
-
-    }
+  }
 };

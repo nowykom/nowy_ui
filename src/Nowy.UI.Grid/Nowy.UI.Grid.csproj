@@ -25,7 +25,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.3" />
     <PackageReference Include="System.Text.Json" Version="7.0.2" />
-    <PackageReference Include="Nowy.Database.Contract" Version="1.0.2.230312655" />
+    <PackageReference Include="Nowy.Database.Contract" Version="1.0.2.230312947" />
   </ItemGroup>
 
 </Project>

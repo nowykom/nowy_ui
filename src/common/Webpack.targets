@@ -16,36 +16,68 @@
     <Touch Files="$(NodeModulesStampFile)" AlwaysCreate="true" />
   </Target>
 
-  <Target Name="NodeCompileFindFiles" DependsOnTargets="NodeInstall">
+  <Target Name="NodeCompileFindFilesComponents" DependsOnTargets="NodeInstall">
     <ItemGroup>
-      <_NodeCompileInputs Include="Components\**\*.ts" />
-      <_NodeCompileInputs Include="Components\**\*.js" />
-      <_NodeCompileInputs Include="Components\**\*.scss" />
-      <_NodeCompileInputs Include="Services\**\*.ts" />
-      <_NodeCompileInputs Include="Services\**\*.js" />
-      <_NodeCompileInputs Include="Services\**\*.scss" />
+      <_NodeCompileInputsComponents Include="Components\**\*.ts" />
+      <_NodeCompileInputsComponents Include="Components\**\*.js" />
+      <_NodeCompileInputsComponents Include="Components\**\*.scss" />
     </ItemGroup>
-    <Message Text="_NodeCompileInputs: @(_NodeCompileInputs)" />
+    <Message Text="_NodeCompileInputsComponents: @(_NodeCompileInputsComponents)" />
   </Target>
 
-  <Target Name="NodeCompile" DependsOnTargets="NodeCompileFindFiles" Inputs="@(_NodeCompileInputs)" Outputs="$(IntermediateOutputPath)_NodeCompile.stamp">
-    <Exec Command="npx webpack --config ../common/webpack.config.js" />
+  <Target Name="NodeCompileFindFilesServices" DependsOnTargets="NodeInstall">
+    <ItemGroup>
+      <_NodeCompileInputsServices Include="Services\**\*.ts" />
+      <_NodeCompileInputsServices Include="Services\**\*.js" />
+      <_NodeCompileInputsServices Include="Services\**\*.scss" />
+    </ItemGroup>
+    <Message Text="_NodeCompileInputsServices: @(_NodeCompileInputsServices)" />
+  </Target>
+
+  <Target Name="NodeCompileFindFilesResources" DependsOnTargets="NodeInstall">
+    <ItemGroup>
+      <_NodeCompileInputsResources Include="resources\**\*.ts" />
+      <_NodeCompileInputsResources Include="resources\**\*.js" />
+      <_NodeCompileInputsResources Include="resources\**\*.scss" />
+    </ItemGroup>
+    <Message Text="_NodeCompileInputsResources: @(_NodeCompileInputsResources)" />
+  </Target>
+
+  <Target Name="NodeCompileComponents" DependsOnTargets="NodeCompileFindFilesComponents" Inputs="@(_NodeCompileInputsComponents)" Outputs="$(NodeCompileComponentsStampFile)">
+    <Copy SourceFiles="..\common\tsconfig.razor.json" DestinationFolder="." SkipUnchangedFiles="true" />
     <Exec Command="npx tsc -p tsconfig.razor.json" />
+
+    <MakeDir Directories="$(NodeCompileStampDirectory)" />
+    <Touch Files="$(NodeCompileComponentsStampFile)" AlwaysCreate="True" />
+    <ItemGroup>
+      <FileWrites Include="$(NodeCompileComponentsStampFile)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="NodeCompileServices" DependsOnTargets="NodeCompileFindFilesServices" Inputs="@(_NodeCompileInputsServices)" Outputs="$(NodeCompileServicesStampFile)">
+    <Copy SourceFiles="..\common\tsconfig.services.json" DestinationFolder="." SkipUnchangedFiles="true" />
     <Exec Command="npx tsc -p tsconfig.services.json" />
 
-    <MakeDir Directories="$(IntermediateOutputPath)" />
-    <Touch Files="$(IntermediateOutputPath)_NodeCompile.stamp" AlwaysCreate="True" />
+    <MakeDir Directories="$(NodeCompileStampDirectory)" />
+    <Touch Files="$(NodeCompileServicesStampFile)" AlwaysCreate="True" />
     <ItemGroup>
-      <FileWrites Include="$(IntermediateOutputPath)_NodeCompile.stamp" />
+      <FileWrites Include="$(NodeCompileServicesStampFile)" />
     </ItemGroup>
   </Target>
 
-  <Target Name="NodeCleanCss" DependsOnTargets="NodeCompile">
+  <Target Name="NodeCompileResources" DependsOnTargets="NodeCompileFindFilesResources" Inputs="@(_NodeCompileInputsResources)" Outputs="$(NodeCompileResourcesStampFile)">
+    <Copy SourceFiles="..\common\tsconfig.webpack.json" DestinationFolder="." SkipUnchangedFiles="true" />
+    <Copy SourceFiles="..\common\webpack.config.js" DestinationFolder="." SkipUnchangedFiles="true" />
+    <Exec Command="npx webpack --config webpack.config.js" />
+
+    <MakeDir Directories="$(NodeCompileStampDirectory)" />
+    <Touch Files="$(NodeCompileResourcesStampFile)" AlwaysCreate="True" />
     <ItemGroup>
-      <_CleanCssInputs Include="wwwroot\output\**\*.css" Exclude="wwwroot\output\**\*.min.css" />
+      <FileWrites Include="$(NodeCompileResourcesStampFile)" />
     </ItemGroup>
-    <Exec Command="npx cleancss -o %(_CleanCssInputs.RelativeDir)\%(_CleanCssInputs.Filename).min.css %(_CleanCssInputs.Identity) " />
-    <Move SourceFiles="%(_CleanCssInputs.RelativeDir)\%(_CleanCssInputs.Filename).min.css" DestinationFiles="%(_CleanCssInputs.RelativeDir)\%(_CleanCssInputs.Filename).css" />
+  </Target>
+
+  <Target Name="NodeCompile" DependsOnTargets="NodeCompileComponents;NodeCompileServices;NodeCompileResources">
   </Target>
 
 </Project>

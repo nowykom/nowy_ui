@@ -13,9 +13,6 @@ module.exports = function (env, {mode}) {
     path.resolve(__dirname, `resources/bundles/init.scss`),
     path.resolve(__dirname, `resources/bundles/init.ts`),
   ];
-  entry_points[`module-leaflet`] = [
-    path.resolve(__dirname, `resources/bundles/module-leaflet.ts`),
-  ];
 
   for (let theme of ['lr', 'ts', 'nowy',]) {
     for (let framework of ['bootstrap5', 'bootstrap5-fluentui',]) {

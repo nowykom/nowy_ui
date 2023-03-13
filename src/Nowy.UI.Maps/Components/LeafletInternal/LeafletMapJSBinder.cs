@@ -16,13 +16,13 @@ internal class LeafletMapJSBinder : IAsyncDisposable
     internal async Task<IJSObjectReference> GetLeafletModule()
     {
         return await ( this._leafletModule ??=
-            this.JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/Nowy.Framework.Blazor/output/module-leaflet.js").AsTask() );
+            this.JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/Nowy.UI.Maps/output/module-leaflet.js").AsTask() );
     }
 
     internal async Task<IJSObjectReference> GetLeafletMapModule()
     {
         return await ( this._leafletMapModule ??=
-            this.JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/Nowy.Framework.Blazor/Components/LeafletInternal/LeafletMapInternal.razor.js").AsTask() );
+            this.JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/Nowy.UI.Maps/Components/LeafletInternal/LeafletMapInternal.razor.js").AsTask() );
     }
 
     /// <inheritdoc/>
