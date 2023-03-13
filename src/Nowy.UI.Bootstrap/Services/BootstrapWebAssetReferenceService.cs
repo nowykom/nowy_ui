@@ -34,7 +34,6 @@ public sealed class BootstrapWebAssetReferenceService : IWebAssetReferenceServic
             $"_content/Nowy.UI.Bootstrap/output/init.js?start_time={this.GetStartTime()}",
             $"_content/Nowy.UI.Bootstrap/output/bundle-{this.JavascriptTheme.ToString().ToLower().Replace("_", "-")}-{this.JavascriptFramework.ToString().ToLower().Replace("_", "-")}.js?start_time={this.GetStartTime()}",
             $"js/app.js?start_time={this.GetStartTime()}",
-            $"{this.WebAssemblyEntryAssembly?.GetName().Name}.styles.css?start_time={this.GetStartTime()}",
         };
 
         return ret;
