@@ -10,6 +10,11 @@ console.log(path.resolve(process.cwd(), 'wwwroot/output'));
 module.exports = function (env, {mode}) {
   const production = mode === 'production';
 
+  if (fs.existsSync('webpack.config.hook.js')) {
+    const {hook} = require(path.resolve(process.cwd(), 'webpack.config.hook'));
+    hook();
+  }
+
   let entry_points = {};
 
   fs.mkdirSync(path.resolve(process.cwd(), 'resources/bundles/'), {recursive: true});

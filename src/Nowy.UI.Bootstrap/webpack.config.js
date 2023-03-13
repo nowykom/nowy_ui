@@ -1,45 +1,37 @@
 const fs = require('fs');
 const path = require('path');
+const glob = require('glob');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const {globSync} = require("glob");
 
-console.log(path.resolve(__dirname, 'wwwroot/output'));
+console.log(path.resolve(process.cwd(), 'wwwroot/output'));
 
 module.exports = function (env, {mode}) {
   const production = mode === 'production';
 
-  let entry_points = {};
-  entry_points[`init`] = [
-    path.resolve(__dirname, `resources/bundles/init.scss`),
-    path.resolve(__dirname, `resources/bundles/init.ts`),
-  ];
-
-  for (let theme of ['lr', 'ts', 'nowy',]) {
-    for (let framework of ['bootstrap5', 'bootstrap5-fluentui',]) {
-
-      let path_bundle_scss = path.resolve(__dirname, `resources/bundles/bundle-${theme}-${framework}.scss`);
-      let path_bundle_ts = path.resolve(__dirname, `resources/bundles/bundle-${theme}-${framework}.ts`);
-
-      fs.writeFileSync(path_bundle_scss, `
-        @import "../nowy/theme-${theme}/_index";
-        @import "../nowy/common/telerik";
-        @import "../nowy/framework-${framework}/_index";
-        @import "../nowy/common/_index";
-        `.split("\n").map((item) => item.trim()).join("\n")
-      );
-      fs.writeFileSync(path_bundle_ts, `
-        import "../nowy/theme-${theme}/_index";
-        import "../nowy/framework-${framework}/_index";
-        import "../nowy/common/_index";
-        `.split("\n").map((item) => item.trim()).join("\n")
-      );
-
-      entry_points[`bundle-${theme}-${framework}`] = [
-        path_bundle_scss,
-        path_bundle_ts,
-      ];
-    }
+  if (fs.existsSync('webpack.config.hook.js')) {
+    const {hook} = require(path.resolve(process.cwd(), 'webpack.config.hook'));
+    hook();
   }
+
+  let entry_points = {};
+
+  fs.mkdirSync(path.resolve(process.cwd(), 'resources/bundles/'), {recursive: true});
+  fs.writeFileSync(path.resolve(process.cwd(), 'resources/bundles/.keep'), new Uint8Array());
+
+  for (let file_path of glob.globSync(path.resolve(process.cwd(), `resources/bundles/*.ts`))) {
+    let entry_name = path.parse(file_path).name;
+    entry_points[entry_name] ??= [];
+    entry_points[entry_name].push(file_path);
+  }
+  for (let file_path of glob.globSync(path.resolve(process.cwd(), `resources/bundles/*.scss`))) {
+    let entry_name = path.parse(file_path).name;
+    entry_points[entry_name] ??= [];
+    entry_points[entry_name].push(file_path);
+  }
+
+  console.log(entry_points);
 
   return {
 
@@ -126,4 +118,3 @@ module.exports = function (env, {mode}) {
 
   }
 };
-

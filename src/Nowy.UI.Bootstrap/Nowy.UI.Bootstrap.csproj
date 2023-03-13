@@ -4,15 +4,10 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-
-    <NodeModulesStampFile>node_modules\_NodeModules.stamp</NodeModulesStampFile>
-    <NodeCompileStampFile>wwwroot\output\_NodeCompile.stamp</NodeCompileStampFile>
-
-    <PrepareForBuildDependsOn>
-      NodeCompile;
-      $(PrepareForBuildDependsOn)
-    </PrepareForBuildDependsOn>
   </PropertyGroup>
+
+  <Import Project="..\common\Webpack.props" />
+  <Import Project="..\common\Webpack.targets" />
 
   <ItemGroup>
     <SupportedPlatform Include="browser" />
@@ -36,38 +31,36 @@
     <ProjectReference Include="..\Nowy.UI.Common\Nowy.UI.Common.csproj" />
   </ItemGroup>
 
-  <Target Name="NodeInstall" Inputs="package.json" Outputs="$(NodeModulesStampFile)">
-    <!--
-        Use npm install or npm ci depending on RestorePackagesWithLockFile value.
-        Uncomment the following lines if you want to use this feature:
-
-        <PropertyGroup>
-          <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-        </PropertyGroup>
-     -->
-    <Exec Command="npm ci" Condition="'$(RestorePackagesWithLockFile)' == 'true'" />
-    <Exec Command="npm install" Condition="'$(RestorePackagesWithLockFile)' != 'true'" />
-
-    <!-- Write the stamp file, so incremental builds work -->
-    <Touch Files="$(NodeModulesStampFile)" AlwaysCreate="true" />
-  </Target>
-
-  <Target Name="NodeCompileFindFiles" DependsOnTargets="NodeInstall">
-    <ItemGroup>
-      <_NodeCompileInputs Include="resources\**\*.ts" />
-      <_NodeCompileInputs Include="resources\**\*.js" />
-      <_NodeCompileInputs Include="resources\**\*.scss" />
-    </ItemGroup>
-    <Message Text="_NodeCompileInputs: @(_NodeCompileInputs)" />
-  </Target>
-  <Target Name="NodeCompile" DependsOnTargets="NodeCompileFindFiles" Inputs="@(_NodeCompileInputs)" Outputs="$(NodeCompileStampFile)">
-    <Exec Command="npx webpack" />
-
-    <MakeDir Directories="$(IntermediateOutputPath)" />
-    <Touch Files="$(NodeCompileStampFile)" AlwaysCreate="True" />
-    <ItemGroup>
-      <FileWrites Include="$(NodeCompileStampFile)" />
-    </ItemGroup>
-  </Target>
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\output\0ea1fc6cdcdbe7abf623.woff2" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\2442644a7a4429aaf45b.eot" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\26228a55e00d47cc7ca2.svg" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\3e1e7fadbeeea08d11e5.woff2" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\42125a176cf7bfb24819.woff" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\66104b766c3d0462b3c5.woff2" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\74f12de10e15e784fb55.ttf" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\7f224b54c9aa6dcea763.ttf" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\a09e19a26c69d41759b6.eot" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\a20ebdc2830d7db8d98f.woff" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\b48ad290d0335879a92b.ttf" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\bff1e040a7ef4f0d0b47.otf" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\bundle-lr-bootstrap5-fluentui.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\bundle-lr-bootstrap5-fluentui.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\bundle-lr-bootstrap5.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\bundle-lr-bootstrap5.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\bundle-nowy-bootstrap5-fluentui.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\bundle-nowy-bootstrap5-fluentui.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\bundle-nowy-bootstrap5.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\bundle-nowy-bootstrap5.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\bundle-ts-bootstrap5-fluentui.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\bundle-ts-bootstrap5-fluentui.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\bundle-ts-bootstrap5.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\bundle-ts-bootstrap5.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\e1a247a5ef41e1975742.woff2" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\f9ee61fab3c11e2f3ed3.ttf" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\init.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\init.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\output\_NodeCompile.stamp" />
+  </ItemGroup>
 
 </Project>
