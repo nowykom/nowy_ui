@@ -36,11 +36,6 @@
     <ProjectReference Include="..\Nowy.UI.Common\Nowy.UI.Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Remove="wwwroot\.gitignore" />
-    <None Include="wwwroot\.gitignore" />
-  </ItemGroup>
-
   <Target Name="NodeInstall" Inputs="package.json" Outputs="$(NodeModulesStampFile)">
     <!--
         Use npm install or npm ci depending on RestorePackagesWithLockFile value.

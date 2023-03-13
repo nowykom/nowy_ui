@@ -25,4 +25,9 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Remove="wwwroot\.gitignore" />
+    <None Include="wwwroot\.gitignore" />
+  </ItemGroup>
+
 </Project>
