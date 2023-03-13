@@ -9,5 +9,4 @@ public static class NowyUIBootstrapExtensions
     {
         services.AddSingleton<IWebAssetReferenceService, BootstrapWebAssetReferenceService>();
     }
-
 }
