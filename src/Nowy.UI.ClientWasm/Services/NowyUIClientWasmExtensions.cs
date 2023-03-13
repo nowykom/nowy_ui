@@ -27,6 +27,7 @@ public static class NowyUIClientWasmExtensions
         builder.Services.AddSingleton<IPlatformInfo>(sp => new WasmPlatformInfo(sp.GetRequiredService<BrowserService>()));
         builder.Services.AddSingleton<FileService>(sp => new WasmFileService(sp.GetRequiredService<IJSRuntime>(), sp.GetRequiredService<ILogger<WasmFileService>>()));
         builder.Services.AddSingleton<BrowserService>(sp => new BrowserService(sp.GetRequiredService<IJSRuntime>()));
+        builder.Services.AddSingleton<ResponsiveStateService>(sp => new ResponsiveStateService(sp.GetRequiredService<IJSRuntime>(), sp.GetRequiredService<BrowserService>()));
     }
 
     public static void UseNowyUIClientWasm(this WebAssemblyHost host, string? app_name = null, string? app_title = null, string? app_version = null)
@@ -37,5 +38,4 @@ public static class NowyUIClientWasmExtensions
         StandardApp.AppVersion = app_version ?? StandardApp.AppVersion;
         StandardApp.AppTitle = app_title ?? StandardApp.AppTitle;
     }
-
 }
