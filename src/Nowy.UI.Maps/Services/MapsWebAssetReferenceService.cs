@@ -18,7 +18,7 @@ public sealed class MapsWebAssetReferenceService : IWebAssetReferenceService
     {
         List<string> ret = new()
         {
-            $"_content/Nowy.UI.Bootstrap/output/module-leaflet.css?start_time={this.GetStartTime()}",
+            $"_content/Nowy.UI.Maps/output/module-leaflet.css?start_time={this.GetStartTime()}",
         };
 
         return ret;
@@ -28,23 +28,9 @@ public sealed class MapsWebAssetReferenceService : IWebAssetReferenceService
     {
         List<string> ret = new()
         {
+            $"_content/Nowy.UI.Maps/output/module-leaflet.js?start_time={this.GetStartTime()}",
         };
 
         return ret;
     }
-}
-
-public enum BootstrapJavascriptTheme
-{
-    NONE = 0,
-    LR,
-    TS,
-    NOWY,
-}
-
-public enum BootstrapJavascriptFramework
-{
-    NONE = 0,
-    BOOTSTRAP5_FLUENTUI,
-    BOOTSTRAP5,
 }
