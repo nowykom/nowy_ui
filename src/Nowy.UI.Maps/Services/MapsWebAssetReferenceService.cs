@@ -5,10 +5,6 @@ namespace Nowy.UI.Maps.Services;
 
 public sealed class MapsWebAssetReferenceService : IWebAssetReferenceService
 {
-    public BootstrapJavascriptFramework JavascriptFramework { get; set; }
-    public BootstrapJavascriptTheme JavascriptTheme { get; set; }
-    public Assembly? WebAssemblyEntryAssembly { get; set; }
-
     public string? InitialPageTitle { get; set; }
 
     private static long? _start_time;
